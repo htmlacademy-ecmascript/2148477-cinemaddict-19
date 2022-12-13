@@ -1,6 +1,6 @@
 import {createElement} from '../util/render.js';
 
-function createFilmDetailsPopupCommentTemplate() {
+function createPopupFilmDetailsCommentTemplate() {
   return (
     `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
@@ -18,9 +18,9 @@ function createFilmDetailsPopupCommentTemplate() {
   );
 }
 
-export default class FilmDetailsPopupCommentView {
+export default class PopupFilmDetailsCommentView {
   getTemplate() {
-    return createFilmDetailsPopupCommentTemplate();
+    return createPopupFilmDetailsCommentTemplate();
   }
 
   getElement() {

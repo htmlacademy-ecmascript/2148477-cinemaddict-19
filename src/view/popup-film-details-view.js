@@ -1,6 +1,6 @@
 import {createElement} from '../util/render.js';
 
-function createFilmDetailsPopupTemplate() {
+function createPopupFilmDetailsTemplate() {
   return (
     `<section class="film-details">
       <div class="film-details__inner">
@@ -116,9 +116,9 @@ function createFilmDetailsPopupTemplate() {
   );
 }
 
-export default class FilmDetailsPopupView {
+export default class PopupFilmDetailsView {
   getTemplate() {
-    return createFilmDetailsPopupTemplate();
+    return createPopupFilmDetailsTemplate();
   }
 
   getElement() {
