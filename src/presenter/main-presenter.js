@@ -7,16 +7,11 @@ import FilmContainerView from '../view/film-container-view';
 import FilmCardView from '../view/film-card-view';
 import ShowMoreButton from '../view/show-more-button-view.js';
 import {render} from '../util/render.js';
+import {renderElementMultipleCount} from '../util/render-multiple.js';
 
 const FILM_CARD_COUNT = 5;
 const FILM_RATED_CARD_COUNT = 2;
 const FILM_COMMENTED_CARD_COUNT = 2;
-
-const renderFilmCardCount = (count, container) => {
-  for (let i = 0; i < count; i++) {
-    render(new FilmCardView, container);
-  }
-};
 
 export default class MainPresenter {
   filmWrapperComponent = new FilmWrapperView();
@@ -46,7 +41,7 @@ export default class MainPresenter {
     render(this.filmListComponent, this.filmWrapperComponent.getElement());
     render(this.filmHeaderComponent, this.filmListComponent.getElement());
     render(this.filmContainerComponent, this.filmListComponent.getElement());
-    renderFilmCardCount(FILM_CARD_COUNT, this.filmContainerComponent.getElement());
+    renderElementMultipleCount(FILM_CARD_COUNT, FilmCardView, this.filmContainerComponent.getElement());
     render(new ShowMoreButton(), this.filmListComponent.getElement());
 
     this.filmListRatedComponent.getElement().classList.add('films-list--extra');
@@ -55,7 +50,7 @@ export default class MainPresenter {
     this.filmHeaderRatedComponent.getElement().classList.remove('visually-hidden');
     render(this.filmHeaderRatedComponent, this.filmListRatedComponent.getElement());
     render(this.filmContainerRatedComponent, this.filmListRatedComponent.getElement());
-    renderFilmCardCount(FILM_RATED_CARD_COUNT, this.filmContainerRatedComponent.getElement());
+    renderElementMultipleCount(FILM_RATED_CARD_COUNT, FilmCardView, this.filmContainerRatedComponent.getElement());
 
     this.filmListCommentedComponent.getElement().classList.add('films-list--extra');
     render(this.filmListCommentedComponent, this.filmWrapperComponent.getElement());
@@ -63,6 +58,6 @@ export default class MainPresenter {
     this.filmHeaderCommentedComponent.getElement().classList.remove('visually-hidden');
     render(this.filmHeaderCommentedComponent, this.filmListCommentedComponent.getElement());
     render(this.filmContainerCommentedComponent, this.filmListCommentedComponent.getElement());
-    renderFilmCardCount(FILM_COMMENTED_CARD_COUNT, this.filmContainerCommentedComponent.getElement());
+    renderElementMultipleCount(FILM_COMMENTED_CARD_COUNT, FilmCardView, this.filmContainerCommentedComponent.getElement());
   }
 }
