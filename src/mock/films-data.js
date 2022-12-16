@@ -21,15 +21,15 @@ const films = [
         'actor 1-2'
       ],
       release: {
-        'date': '2019-05-11T00:00:00.000Z',
-        'release_country': 'country 1'
+        date: '2019-05-11T00:00:00.000Z',
+        releaseCountry: 'country 1'
       },
       duration: 71,
       genre: [
         'genre 1-1',
         'genre 1-2'
       ],
-      description: 'description 1'
+      description: 'description 1 >140 letters oo ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc'
     },
     userDetails: {
       watchlist: false,
@@ -57,8 +57,8 @@ const films = [
         'actor 2-2'
       ],
       release: {
-        'date': '2019-05-11T00:00:00.000Z',
-        'release_country': 'country 2'
+        date: '2019-05-11T00:00:00.000Z',
+        releaseCountry: 'country 2'
       },
       duration: 71,
       genre: [
@@ -93,8 +93,8 @@ const films = [
         'actor 3-2'
       ],
       release: {
-        'date': '2019-05-11T00:00:00.000Z',
-        'release_country': 'country 3'
+        date: '2019-05-11T00:00:00.000Z',
+        releaseCountry: 'country 3'
       },
       duration: 73,
       genre: [
@@ -129,8 +129,8 @@ const films = [
         'actor 4-2'
       ],
       release: {
-        'date': '2019-05-11T00:00:00.000Z',
-        'release_country': 'country 4'
+        date: '2019-05-11T00:00:00.000Z',
+        releaseCountry: 'country 4'
       },
       duration: 74,
       genre: [
@@ -165,15 +165,15 @@ const films = [
         'actor 5-2'
       ],
       release: {
-        'date': '2019-05-11T00:00:00.000Z',
-        'release_country': 'country 5'
+        date: '2019-05-11T00:00:00.000Z',
+        releaseCountry: 'country 5'
       },
       duration: 75,
       genre: [
         'genre 5-1',
         'genre 5-2'
       ],
-      description: 'description 5'
+      description: 'description 5 >140 letters oo ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc'
     },
     userDetails: {
       watchlist: true,
@@ -201,8 +201,8 @@ const films = [
         'actor 6-2'
       ],
       release: {
-        'date': '2019-05-11T00:00:00.000Z',
-        'release_country': 'country 6'
+        date: '2019-05-11T00:00:00.000Z',
+        releaseCountry: 'country 6'
       },
       duration: 76,
       genre: [
@@ -237,15 +237,15 @@ const films = [
         'actor 7-2'
       ],
       release: {
-        'date': '2019-05-11T00:00:00.000Z',
-        'release_country': 'country 7'
+        date: '2019-05-11T00:00:00.000Z',
+        releaseCountry: 'country 7'
       },
       duration: 77,
       genre: [
         'genre 7-1',
         'genre 7-2'
       ],
-      description: 'description 7'
+      description: 'description 7 >140 letters oo ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc'
     },
     userDetails: {
       watchlist: false,

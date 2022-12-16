@@ -9,7 +9,6 @@ import ShowMoreButton from '../view/show-more-button-view.js';
 import {render} from '../util/render.js';
 import {renderElementMultipleCount} from '../util/render-multiple.js';
 
-const FILM_CARD_COUNT = 5;
 const FILM_RATED_CARD_COUNT = 2;
 const FILM_COMMENTED_CARD_COUNT = 2;
 
@@ -28,11 +27,14 @@ export default class MainPresenter {
   filmHeaderCommentedComponent = new FilmListHeaderView();
   filmContainerCommentedComponent = new FilmContainerView();
 
-  constructor({container}) {
+  constructor({container, filmsModel}) {
     this.container = container;
+    this.filmsModel = filmsModel;
   }
 
   init() {
+    this.filmCards = [...this.filmsModel.getFilms()];
+
     render(new FilterBarView(), this.container);
     render(new SortBarView(), this.container);
 
@@ -40,10 +42,15 @@ export default class MainPresenter {
 
     render(this.filmListComponent, this.filmWrapperComponent.getElement());
     render(this.filmHeaderComponent, this.filmListComponent.getElement());
+
     render(this.filmContainerComponent, this.filmListComponent.getElement());
-    renderElementMultipleCount(FILM_CARD_COUNT, FilmCardView, this.filmContainerComponent.getElement());
+    for (let i = 0; i < this.filmCards.length; i++) {
+      render(new FilmCardView({card: this.filmCards[i]}), this.filmContainerComponent.getElement());
+    }
+
     render(new ShowMoreButton(), this.filmListComponent.getElement());
 
+    // Top rated section
     this.filmListRatedComponent.getElement().classList.add('films-list--extra');
     render(this.filmListRatedComponent, this.filmWrapperComponent.getElement());
     this.filmHeaderRatedComponent.getElement().innerHTML = 'Top rated';
@@ -52,6 +59,7 @@ export default class MainPresenter {
     render(this.filmContainerRatedComponent, this.filmListRatedComponent.getElement());
     renderElementMultipleCount(FILM_RATED_CARD_COUNT, FilmCardView, this.filmContainerRatedComponent.getElement());
 
+    // Most commented section
     this.filmListCommentedComponent.getElement().classList.add('films-list--extra');
     render(this.filmListCommentedComponent, this.filmWrapperComponent.getElement());
     this.filmHeaderCommentedComponent.getElement().innerHTML = 'Most commented';
