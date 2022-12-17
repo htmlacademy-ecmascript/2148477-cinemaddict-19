@@ -45,27 +45,27 @@ export default class MainPresenter {
 
     render(this.filmContainerComponent, this.filmListComponent.getElement());
     for (let i = 0; i < this.filmCards.length; i++) {
-      render(new FilmCardView({card: this.filmCards[i]}), this.filmContainerComponent.getElement());
+      render(new FilmCardView({filmCard: this.filmCards[i]}), this.filmContainerComponent.getElement());
     }
 
     render(new ShowMoreButton(), this.filmListComponent.getElement());
 
-    // Top rated section
-    this.filmListRatedComponent.getElement().classList.add('films-list--extra');
-    render(this.filmListRatedComponent, this.filmWrapperComponent.getElement());
-    this.filmHeaderRatedComponent.getElement().innerHTML = 'Top rated';
-    this.filmHeaderRatedComponent.getElement().classList.remove('visually-hidden');
-    render(this.filmHeaderRatedComponent, this.filmListRatedComponent.getElement());
-    render(this.filmContainerRatedComponent, this.filmListRatedComponent.getElement());
-    renderElementMultipleCount(FILM_RATED_CARD_COUNT, FilmCardView, this.filmContainerRatedComponent.getElement());
+    // // Top rated section
+    // this.filmListRatedComponent.getElement().classList.add('films-list--extra');
+    // render(this.filmListRatedComponent, this.filmWrapperComponent.getElement());
+    // this.filmHeaderRatedComponent.getElement().innerHTML = 'Top rated';
+    // this.filmHeaderRatedComponent.getElement().classList.remove('visually-hidden');
+    // render(this.filmHeaderRatedComponent, this.filmListRatedComponent.getElement());
+    // render(this.filmContainerRatedComponent, this.filmListRatedComponent.getElement());
+    // renderElementMultipleCount(FILM_RATED_CARD_COUNT, FilmCardView, this.filmContainerRatedComponent.getElement());
 
-    // Most commented section
-    this.filmListCommentedComponent.getElement().classList.add('films-list--extra');
-    render(this.filmListCommentedComponent, this.filmWrapperComponent.getElement());
-    this.filmHeaderCommentedComponent.getElement().innerHTML = 'Most commented';
-    this.filmHeaderCommentedComponent.getElement().classList.remove('visually-hidden');
-    render(this.filmHeaderCommentedComponent, this.filmListCommentedComponent.getElement());
-    render(this.filmContainerCommentedComponent, this.filmListCommentedComponent.getElement());
-    renderElementMultipleCount(FILM_COMMENTED_CARD_COUNT, FilmCardView, this.filmContainerCommentedComponent.getElement());
+    // // Most commented section
+    // this.filmListCommentedComponent.getElement().classList.add('films-list--extra');
+    // render(this.filmListCommentedComponent, this.filmWrapperComponent.getElement());
+    // this.filmHeaderCommentedComponent.getElement().innerHTML = 'Most commented';
+    // this.filmHeaderCommentedComponent.getElement().classList.remove('visually-hidden');
+    // render(this.filmHeaderCommentedComponent, this.filmListCommentedComponent.getElement());
+    // render(this.filmContainerCommentedComponent, this.filmListCommentedComponent.getElement());
+    // renderElementMultipleCount(FILM_COMMENTED_CARD_COUNT, FilmCardView, this.filmContainerCommentedComponent.getElement());
   }
 }

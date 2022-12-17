@@ -24,12 +24,12 @@ const films = [
         date: '2019-05-11T00:00:00.000Z',
         releaseCountry: 'country 1'
       },
-      duration: 71,
+      duration: 131,
       genre: [
         'genre 1-1',
         'genre 1-2'
       ],
-      description: 'description 1 >140 letters oo ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc ccccccccc'
+      description: 'description 1 >140 letters oo ccccccccccc ccccccccccc ccccccccccc ccccccccccc ccccccccccc ccccccccccc ccccccccccc ccccccccccc ccccccccccc ccccccccccc ccccccccccc ccccccccccc ccccccccccc'
     },
     userDetails: {
       watchlist: false,
@@ -57,10 +57,10 @@ const films = [
         'actor 2-2'
       ],
       release: {
-        date: '2019-05-11T00:00:00.000Z',
+        date: '2018-05-11T00:00:00.000Z',
         releaseCountry: 'country 2'
       },
-      duration: 71,
+      duration: 72,
       genre: [
         'genre 2-1',
         'genre 2-2'
@@ -93,10 +93,10 @@ const films = [
         'actor 3-2'
       ],
       release: {
-        date: '2019-05-11T00:00:00.000Z',
+        date: '2017-05-11T00:00:00.000Z',
         releaseCountry: 'country 3'
       },
-      duration: 73,
+      duration: 253,
       genre: [
         'genre 3-1',
         'genre 3-2'
@@ -129,7 +129,7 @@ const films = [
         'actor 4-2'
       ],
       release: {
-        date: '2019-05-11T00:00:00.000Z',
+        date: '2016-05-11T00:00:00.000Z',
         releaseCountry: 'country 4'
       },
       duration: 74,
@@ -165,7 +165,7 @@ const films = [
         'actor 5-2'
       ],
       release: {
-        date: '2019-05-11T00:00:00.000Z',
+        date: '2015-05-11T00:00:00.000Z',
         releaseCountry: 'country 5'
       },
       duration: 75,
@@ -201,7 +201,7 @@ const films = [
         'actor 6-2'
       ],
       release: {
-        date: '2019-05-11T00:00:00.000Z',
+        date: '2014-05-11T00:00:00.000Z',
         releaseCountry: 'country 6'
       },
       duration: 76,
@@ -237,7 +237,7 @@ const films = [
         'actor 7-2'
       ],
       release: {
-        date: '2019-05-11T00:00:00.000Z',
+        date: '2013-05-11T00:00:00.000Z',
         releaseCountry: 'country 7'
       },
       duration: 77,
