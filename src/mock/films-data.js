@@ -65,7 +65,7 @@ const films = [
         'genre 2-1',
         'genre 2-2'
       ],
-      description: 'description 1'
+      description: 'description 2'
     },
     userDetails: {
       watchlist: true,
@@ -137,7 +137,7 @@ const films = [
         'genre 4-1',
         'genre 4-2'
       ],
-      description: 'description 1'
+      description: 'description 4'
     },
     userDetails: {
       watchlist: false,
