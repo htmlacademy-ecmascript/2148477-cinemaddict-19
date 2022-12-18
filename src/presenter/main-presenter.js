@@ -1,4 +1,3 @@
-import FilterBarView from '../view/filter-bar-view';
 import SortBarView from '../view/sort-bar-view.js';
 import FilmWrapperView from '../view/film-wrapper-view.js';
 import FilmListView from '../view/film-list-view.js';
@@ -7,7 +6,6 @@ import FilmContainerView from '../view/film-container-view';
 import FilmCardView from '../view/film-card-view';
 import ShowMoreButton from '../view/show-more-button-view.js';
 import {render} from '../util/render.js';
-import {renderElementMultipleCount} from '../util/render-multiple.js';
 
 const FILM_RATED_CARD_COUNT = 2;
 const FILM_COMMENTED_CARD_COUNT = 2;
@@ -35,7 +33,6 @@ export default class MainPresenter {
   init() {
     this.filmCards = [...this.filmsModel.getFilms()];
 
-    render(new FilterBarView(), this.container);
     render(new SortBarView(), this.container);
 
     render(this.filmWrapperComponent, this.container);
