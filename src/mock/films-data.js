@@ -8,7 +8,7 @@ const films = [
     filmInfo: {
       title: 'title 1',
       alternativeTitle: 'alt title 1',
-      totalRating: 5.1,
+      totalRating: 9.1,
       poster: getRandomArrayElement(POSTERS),
       ageRating: 0,
       director: 'director 1',
@@ -44,7 +44,7 @@ const films = [
     filmInfo: {
       title: 'title 2',
       alternativeTitle: 'alt title 2',
-      totalRating: 5.2,
+      totalRating: 6.2,
       poster: getRandomArrayElement(POSTERS),
       ageRating: 1,
       director: 'director 2',
