@@ -5,15 +5,13 @@ import {getPreviewFilmDescription} from '../util/film-description.js';
 function createFilmCardTemplate(filmCard) {
   const {filmInfo, comments} = filmCard;
 
-  const releaseDate = getReleaseYear(filmInfo.release.date);
-
   return (
     `<article class="film-card">
       <a class="film-card__link">
         <h3 class="film-card__title">${filmInfo.title}</h3>
         <p class="film-card__rating">${filmInfo.totalRating}</p>
         <p class="film-card__info">
-          <span class="film-card__year">${releaseDate}</span>
+          <span class="film-card__year">${getReleaseYear(filmInfo.release.date)}</span>
           <span class="film-card__duration">${getHoursMinutes(filmInfo.duration)}</span>
           <span class="film-card__genre">${filmInfo.genre[0]}</span>
         </p>

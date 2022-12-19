@@ -1,4 +1,4 @@
-import FilterBarView from '../view/filter-bar-view';import {render} from '../util/render.js';
+import FilterBarView from '../view/filter-bar-view';import { render } from '../util/render.js';
 
 export default class FilterBarPresenter {
   constructor({container, filmsModel}) {

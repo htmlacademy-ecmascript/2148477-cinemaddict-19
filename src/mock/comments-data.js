@@ -204,4 +204,8 @@ function getCommentById(id) {
   return comments.find( (comment) => (comment[id] === id) );
 }
 
-export {getCommentById};
+function getCommentsArr() {
+  return comments;
+}
+
+export {getCommentById, getCommentsArr};

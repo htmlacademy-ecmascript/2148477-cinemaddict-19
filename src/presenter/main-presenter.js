@@ -5,7 +5,7 @@ import FilmListHeaderView from '../view/film-list-header-view.js';
 import FilmContainerView from '../view/film-container-view';
 import FilmCardView from '../view/film-card-view';
 import ShowMoreButton from '../view/show-more-button-view.js';
-import {render} from '../util/render.js';
+import { render } from '../util/render.js';
 
 export default class MainPresenter {
   filmWrapperComponent = new FilmWrapperView();

@@ -2,7 +2,7 @@ import FilmListView from '../view/film-list-view.js';
 import FilmListHeaderView from '../view/film-list-header-view.js';
 import FilmContainerView from '../view/film-container-view';
 import FilmCardView from '../view/film-card-view';
-import {render} from '../util/render.js';
+import { render } from '../util/render.js';
 
 const FILM_COMMENTED_CARD_COUNT = 2;
 
