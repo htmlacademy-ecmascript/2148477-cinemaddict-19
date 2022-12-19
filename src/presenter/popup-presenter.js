@@ -20,10 +20,8 @@ export default class PopupPresenter {
 
   init() {
     this.filmCard = this.filmsModel.getFilms()[3];
-    this.comments = [...this.commentsModel.getComments()].filter(
-      (comment) => this.filmCard.comments.some(
-        (commentId) => +comment.id === commentId
-      )
+    this.comments = this.commentsModel.getComments().filter(
+      (comment) => this.filmCard.comments.includes(+comment.id)
     );
 
     render(this.popupComponent, this.container);
