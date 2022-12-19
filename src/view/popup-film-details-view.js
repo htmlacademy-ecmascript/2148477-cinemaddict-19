@@ -3,7 +3,7 @@ import {getReleaseDate, getHoursMinutes} from '../util/date-time.js';
 
 function createPopupFilmDetailsTemplate(filmCard) {
 
-  const {filmInfo} = filmCard;
+  const {filmInfo, userDetails} = filmCard;
 
   function getGenresList (genres) {
     let genresTemplate = '';
@@ -75,9 +75,11 @@ function createPopupFilmDetailsTemplate(filmCard) {
       </div>
 
       <section class="film-details__controls">
-        <button type="button" class="film-details__control-button film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
-        <button type="button" class="film-details__control-button film-details__control-button--active film-details__control-button--watched" id="watched" name="watched">Already watched</button>
-        <button type="button" class="film-details__control-button film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
+        <button type="button" class="film-details__control-button film-details__control-button--watchlist${userDetails.watchlist ? ' film-details__control-button--active' : ''}" id="watchlist" name="watchlist">Add to watchlist</button>
+
+        <button type="button" class="film-details__control-button film-details__control-button--watched${userDetails.alreadyWatched ? ' film-details__control-button--active' : ''}" id="watched" name="watched">Already watched</button>
+
+        <button type="button" class="film-details__control-button film-details__control-button--favorite${userDetails.favorite ? ' film-details__control-button--active' : ''}" id="favorite" name="favorite">Add to favorites</button>
       </section>
     </div>`
   );
