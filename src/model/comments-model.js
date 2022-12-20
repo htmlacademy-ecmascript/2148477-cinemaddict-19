@@ -1,7 +1,7 @@
-import { getCommentsArr } from '../mock/comments-data.js';
+import { COMMENTS } from '../mock/comments-data.js';
 
 export default class CommentsModel {
-  comments = getCommentsArr();
+  comments = COMMENTS;
 
   getComments() {
     return this.comments;

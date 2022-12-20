@@ -1,7 +1,7 @@
 import {getRandomArrayElement} from '../util/random-array-element.js';
 import {EMOTIONS} from '../const.js';
 
-const comments = [
+const COMMENTS = [
   {
     id: '1',
     author: 'author 1',
@@ -201,11 +201,7 @@ const comments = [
 ];
 
 function getCommentById(id) {
-  return comments.find( (comment) => (comment[id] === id) );
+  return COMMENTS.find( (comment) => (comment[id] === id) );
 }
 
-function getCommentsArr() {
-  return comments;
-}
-
-export {getCommentById, getCommentsArr};
+export {getCommentById, COMMENTS};
