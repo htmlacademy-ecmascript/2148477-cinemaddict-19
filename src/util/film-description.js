@@ -1,15 +1,15 @@
-const PREVIEW_DESCRIPTION_LENGTH = 140;
+const PREVIEW_FILM_DESCRIPTION_LENGTH = 140;
 
-function getPreviewFilmDescription(fullDescription) {
+function getPreviewFilmDescription(fullFilmDescription) {
 
-  if (fullDescription.length > PREVIEW_DESCRIPTION_LENGTH) {
-    const previewFilmDescription = fullDescription.slice(0, PREVIEW_DESCRIPTION_LENGTH + 1);
+  if (fullFilmDescription.length > PREVIEW_FILM_DESCRIPTION_LENGTH) {
+    const previewFilmDescription = fullFilmDescription.slice(0, PREVIEW_FILM_DESCRIPTION_LENGTH + 1);
     const lastSpaceIndex = previewFilmDescription.lastIndexOf(' ');
 
     return `${previewFilmDescription.slice(0, lastSpaceIndex)} ...`;
   }
 
-  return fullDescription;
+  return fullFilmDescription;
 }
 
 export {getPreviewFilmDescription};
