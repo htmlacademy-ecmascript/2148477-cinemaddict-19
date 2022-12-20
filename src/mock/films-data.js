@@ -1,7 +1,7 @@
 import {getRandomArrayElement} from '../util/random-array-element.js';
 import {POSTERS} from '../const.js';
 
-const films = [
+const FILMS = [
   {
     id: '0',
     comments: [1],
@@ -257,7 +257,7 @@ const films = [
 ];
 
 function getRandomFilmData() {
-  return getRandomArrayElement(films);
+  return getRandomArrayElement(FILMS);
 }
 
 export {getRandomFilmData};
