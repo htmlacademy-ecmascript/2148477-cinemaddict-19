@@ -9,18 +9,9 @@ export default class FilterBarPresenter {
   init() {
     this.filmCards = [...this.filmsModel.getFilms()];
 
-    this.watchlist = this.filmCards.reduce(
-      (sum, film) => sum + (film.userDetails.watchlist ? 1 : 0),
-      0
-    );
-    this.alreadyWatched = this.filmCards.reduce(
-      (sum, film) => sum + (film.userDetails.alreadyWatched ? 1 : 0),
-      0
-    );
-    this.favorite = this.filmCards.reduce(
-      (sum, film) => sum + (film.userDetails.favorite ? 1 : 0),
-      0
-    );
+    this.watchlist = this.filmCards.filter( (film) => film.userDetails.watchlist).length;
+    this.alreadyWatched = this.filmCards.filter( (film) => film.userDetails.alreadyWatched).length;
+    this.favorite = this.filmCards.filter( (film) => film.userDetails.favorite).length;
 
     render(new FilterBarView({watchlist: this.watchlist, alreadyWatched: this.alreadyWatched, favorite: this.favorite}), this.container);
   }
