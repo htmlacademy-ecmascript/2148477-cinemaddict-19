@@ -28,23 +28,26 @@ function createUserProfileTemplate(alreadyWatched) {
 }
 
 export default class UserProfileView {
+  #element = null;
+  #alreadyWatched = null;
+
   constructor({alreadyWatched}) {
-    this.alreadyWatched = alreadyWatched;
+    this.#alreadyWatched = alreadyWatched;
   }
 
-  getTemplate() {
-    return createUserProfileTemplate(this.alreadyWatched);
+  get template() {
+    return createUserProfileTemplate(this.#alreadyWatched);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
