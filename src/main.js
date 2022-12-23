@@ -6,11 +6,9 @@ import FilterBarPresenter from './presenter/filters-presenter.js';
 import MainPresenter from './presenter/main-presenter.js';
 import TopRatedPresenter from './presenter/top-raterd-presenter.js';
 import TopCommentedPresenter from './presenter/top-commented-presenter.js';
-import PopupPresenter from './presenter/popup-presenter.js';
 import FilmsModel from './model/films-model.js';
 import CommentsModel from './model/comments-model.js';
 
-const page = document.querySelector('.page');
 const pageHeader = document.querySelector('.header');
 const pageMain = document.querySelector('.main');
 const pageFooterStatistics = document.querySelector('.footer__statistics');
@@ -29,19 +27,16 @@ const filterBarPresenter = new FilterBarPresenter({
 const mainPresenter = new MainPresenter({
   container: pageMain,
   filmsModel,
+  commentsModel,
 });
 const topRatedPresenter = new TopRatedPresenter({
   container: mainPresenter.filmWrapperComponent,
   filmsModel,
+  commentsModel,
 });
 const topCommentedPresenter = new TopCommentedPresenter({
   container: mainPresenter.filmWrapperComponent,
   filmsModel,
-});
-const popupPresenter = new PopupPresenter({
-  container: page,
-  filmsModel,
-  commentsModel,
 });
 
 render(new FooterStatisticView(), pageFooterStatistics);
@@ -51,4 +46,3 @@ filterBarPresenter.init();
 mainPresenter.init();
 topRatedPresenter.init();
 topCommentedPresenter.init();
-popupPresenter.init();

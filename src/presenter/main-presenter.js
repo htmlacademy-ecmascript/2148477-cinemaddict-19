@@ -5,9 +5,12 @@ import FilmListHeaderView from '../view/film-list-header-view.js';
 import FilmContainerView from '../view/film-container-view';
 import FilmCardView from '../view/film-card-view';
 import ShowMoreButton from '../view/show-more-button-view.js';
+import PopupPresenter from './popup-presenter.js';
 import { render } from '../util/render.js';
 
 export default class MainPresenter {
+  #page = document.querySelector('.page');
+
   #filmWrapperComponent = new FilmWrapperView();
 
   #filmListComponent = new FilmListView();
@@ -16,13 +19,15 @@ export default class MainPresenter {
 
   #container = null;
   #filmsModel = null;
+  #commentsModel = null;
 
   #filmCards = [];
 
 
-  constructor({container, filmsModel}) {
+  constructor({container, filmsModel, commentsModel}) {
     this.#container = container;
     this.#filmsModel = filmsModel;
+    this.#commentsModel = commentsModel;
   }
 
   get filmWrapperComponent() {
@@ -41,9 +46,24 @@ export default class MainPresenter {
 
     render(this.#filmContainerComponent, this.#filmListComponent.element);
     for (let i = 0; i < this.#filmCards.length; i++) {
-      render(new FilmCardView({filmCard: this.#filmCards[i]}), this.#filmContainerComponent.element);
+      this.#renderFilmCard(this.#filmCards[i], this.#commentsModel);
     }
 
     render(new ShowMoreButton(), this.#filmListComponent.element);
+  }
+
+  #renderFilmCard(filmCard, commentsModel) {
+    const filmCardComponent = new FilmCardView({filmCard});
+    const popupPresenter = new PopupPresenter({
+      container: this.#page,
+      filmCard,
+      commentsModel
+    });
+
+    filmCardComponent.element.querySelector('.film-card__link').addEventListener('click', () => {
+      popupPresenter.init();
+    });
+
+    render(filmCardComponent, this.#filmContainerComponent.element);
   }
 }
