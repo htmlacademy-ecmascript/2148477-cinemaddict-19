@@ -3,15 +3,15 @@ import {createElement} from '../util/render.js';
 function createUserProfileTemplate(alreadyWatched) {
   const WATCHED_FILMS_TO_BE_FAN = 11;
   const WATCHED_FILMS_TO_BE_MOVIE_BUFF = 21;
-  let profileRating = 'novice';
 
-  if (alreadyWatched === 0) {
-    return '';
+  let profileRating = '';
+  if (alreadyWatched < WATCHED_FILMS_TO_BE_FAN) {
+    profileRating = 'novice';
   }
-
-  if (alreadyWatched >= WATCHED_FILMS_TO_BE_FAN && alreadyWatched < WATCHED_FILMS_TO_BE_MOVIE_BUFF) {
+  if (alreadyWatched >= WATCHED_FILMS_TO_BE_FAN) {
     profileRating = 'fan';
-  } else if (alreadyWatched >= WATCHED_FILMS_TO_BE_MOVIE_BUFF) {
+  }
+  if (alreadyWatched >= WATCHED_FILMS_TO_BE_MOVIE_BUFF) {
     profileRating = 'movie buff';
   }
 
@@ -36,6 +36,10 @@ export default class UserProfileView {
   }
 
   get template() {
+    if (this.#alreadyWatched === 0) {
+      return '';
+    }
+
     return createUserProfileTemplate(this.#alreadyWatched);
   }
 
