@@ -8,33 +8,73 @@ import PopupCommentView from '../view/popup-comment-view.js';
 import { render } from '../util/render.js';
 
 export default class PopupPresenter {
-  popupComponent = new PopupView();
-  popupCommentContainerComponent = new PopupCommentContainerView();
-  popupCommentListComponent = new PopupCommentListView();
+  #popupComponent = new PopupView();
+  #popupCommentContainerComponent = new PopupCommentContainerView();
+  #popupCommentListComponent = new PopupCommentListView();
 
-  constructor({container, filmsModel, commentsModel}) {
-    this.container = container;
-    this.filmsModel = filmsModel;
-    this.commentsModel = commentsModel;
+  #container = null;
+  #filmCard = null;
+  #commentsModel = null;
+  #popupFilmDetailsComponent = null;
+  #popupCommentHeaderComponent = null;
+  #popupCommentNewComponent = null;
+
+  #comments = [];
+
+  constructor({container, filmCard, commentsModel}) {
+    this.#container = container;
+    this.#filmCard = filmCard;
+    this.#commentsModel = commentsModel;
   }
 
   init() {
-    this.filmCard = this.filmsModel.getFilms()[3];
-    this.comments = this.commentsModel.getComments().filter(
-      (comment) => this.filmCard.comments.includes(+comment.id)
-    );
+    this.#popupFilmDetailsComponent = new PopupFilmDetailsView({filmCard: this.#filmCard});
+    this.#popupCommentHeaderComponent = new PopupCommentHeaderView({filmCard: this.#filmCard});
+    this.#popupCommentNewComponent = new PopupCommentNewView();
 
-    render(this.popupComponent, this.container);
-    render(new PopupFilmDetailsView({filmCard: this.filmCard}), this.popupComponent.getElement().firstElementChild);
+    const removePopup = () => {
+      this.#container.classList.remove('hide-overflow');
+      this.#container.removeEventListener('keydown', escKeyDownHandler);
 
-    render(this.popupCommentContainerComponent, this.popupComponent.getElement().firstElementChild);
-    render(new PopupCommentHeaderView({filmCard: this.filmCard}), this.popupCommentContainerComponent.getElement().firstElementChild);
+      this.#container.removeChild(this.#popupComponent.element);
 
-    render(this.popupCommentListComponent, this.popupCommentContainerComponent.getElement().firstElementChild);
-    for (const comment of this.comments) {
-      render(new PopupCommentView({comment}), this.popupCommentListComponent.getElement());
+      this.#popupComponent.removeElement();
+      this.#popupFilmDetailsComponent.removeElement();
+      this.#popupCommentContainerComponent.removeElement();
+      this.#popupCommentHeaderComponent.removeElement();
+      this.#popupCommentListComponent.removeElement();
+      this.#popupCommentNewComponent.removeElement();
+    };
+
+    function escKeyDownHandler (evt) {
+      if (evt.code === 'Escape') {
+        evt.preventDefault();
+        removePopup();
+      }
     }
 
-    render(new PopupCommentNewView(), this.popupCommentContainerComponent.getElement().firstElementChild);
+    this.#container.classList.add('hide-overflow');
+    this.#container.addEventListener('keydown', escKeyDownHandler);
+
+    this.#comments = this.#commentsModel.comments.filter(
+      (comment) => this.#filmCard.comments.includes(+comment.id)
+    );
+
+    render(this.#popupComponent, this.#container);
+
+    render(this.#popupFilmDetailsComponent, this.#popupComponent.element.firstElementChild);
+    this.#popupFilmDetailsComponent.element.querySelector('.film-details__close-btn').addEventListener('click', () => {
+      removePopup();
+    });
+
+    render(this.#popupCommentContainerComponent, this.#popupComponent.element.firstElementChild);
+    render(this.#popupCommentHeaderComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+
+    render(this.#popupCommentListComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+    for (const comment of this.#comments) {
+      render(new PopupCommentView({comment}), this.#popupCommentListComponent.element);
+    }
+
+    render(this.#popupCommentNewComponent, this.#popupCommentContainerComponent.element.firstElementChild);
   }
 }

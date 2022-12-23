@@ -5,23 +5,26 @@ function createPopupCommentHeaderTemplate(filmCard) {
 }
 
 export default class PopupCommentHeaderView {
+  #element = null;
+  #filmCard = null;
+
   constructor({filmCard}) {
-    this.filmCard = filmCard;
+    this.#filmCard = filmCard;
   }
 
-  getTemplate() {
-    return createPopupCommentHeaderTemplate(this.filmCard);
+  get template() {
+    return createPopupCommentHeaderTemplate(this.#filmCard);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

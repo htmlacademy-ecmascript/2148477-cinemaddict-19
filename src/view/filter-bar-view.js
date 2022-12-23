@@ -12,25 +12,31 @@ function createFilterBarTemplate(watchlist, alreadyWatched, favorite) {
 }
 
 export default class FilterBarView {
+  #element = null;
+  #watchlist = null;
+  #alreadyWatched = null;
+  #favorite = null;
+
+
   constructor({watchlist, alreadyWatched, favorite}) {
-    this.watchlist = watchlist;
-    this.alreadyWatched = alreadyWatched;
-    this.favorite = favorite;
+    this.#watchlist = watchlist;
+    this.#alreadyWatched = alreadyWatched;
+    this.#favorite = favorite;
   }
 
-  getTemplate() {
-    return createFilterBarTemplate(this.watchlist, this.alreadyWatched, this.favorite);
+  get template() {
+    return createFilterBarTemplate(this.#watchlist, this.#alreadyWatched, this.#favorite);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

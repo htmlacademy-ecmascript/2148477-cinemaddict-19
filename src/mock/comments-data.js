@@ -174,28 +174,28 @@ const COMMENTS = [
     id: '25',
     author: 'author 25',
     comment: 'comment 25',
-    date: '2019-05-11T16:12:32.554Z',
+    date: '2022-12-23T12:12:32.554Z',
     emotion: getRandomArrayElement(EMOTIONS),
   },
   {
     id: '26',
     author: 'author 26',
     comment: 'comment 26',
-    date: '2019-05-11T16:12:32.554Z',
+    date: '2022-12-23T15:25:32.554Z',
     emotion: getRandomArrayElement(EMOTIONS),
   },
   {
     id: '27',
     author: 'author 27',
     comment: 'comment 27',
-    date: '2019-05-11T16:12:32.554Z',
+    date: '2022-05-11T16:12:32.554Z',
     emotion: getRandomArrayElement(EMOTIONS),
   },
   {
     id: '28',
     author: 'author 28',
     comment: 'comment 28',
-    date: '2019-05-11T16:12:32.554Z',
+    date: '2022-12-11T16:12:32.554Z',
     emotion: getRandomArrayElement(EMOTIONS),
   }
 ];

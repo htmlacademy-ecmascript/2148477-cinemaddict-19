@@ -2,17 +2,23 @@ import UserProfileView from '../view/user-profile-view';
 import { render } from '../util/render.js';
 
 export default class HeaderPresenter {
+  #container = null;
+  #filmsModel = null;
+
+  #filmCards = [];
+
+  #alreadyWatched = 0;
+
   constructor({container, filmsModel}) {
-    this.container = container;
-    this.filmsModel = filmsModel;
+    this.#container = container;
+    this.#filmsModel = filmsModel;
   }
 
   init() {
-    this.alreadyWatched = [...this.filmsModel.getFilms()].reduce(
-      (sum, film) => sum + (film.userDetails.alreadyWatched ? 1 : 0),
-      0
-    );
+    this.#filmCards = [...this.#filmsModel.films];
 
-    render(new UserProfileView({alreadyWatched: this.alreadyWatched}), this.container);
+    this.#alreadyWatched = this.#filmCards.filter( (film) => film.userDetails.alreadyWatched).length;
+
+    render(new UserProfileView({alreadyWatched: this.#alreadyWatched}), this.#container);
   }
 }
