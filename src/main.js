@@ -4,8 +4,8 @@ import { render } from './util/render.js';
 import HeaderPresenter from './presenter/header-presenter.js';
 import FilterBarPresenter from './presenter/filters-presenter.js';
 import MainPresenter from './presenter/main-presenter.js';
-import TopRatedPresenter from './presenter/top-raterd-presenter.js';
-import TopCommentedPresenter from './presenter/top-commented-presenter.js';
+import TopRatedPresenter from './presenter/top-rated-presenter.js';
+import MostCommentedPresenter from './presenter/most-commented-presenter.js';
 import FilmsModel from './model/films-model.js';
 import CommentsModel from './model/comments-model.js';
 
@@ -34,9 +34,10 @@ const topRatedPresenter = new TopRatedPresenter({
   filmsModel,
   commentsModel,
 });
-const topCommentedPresenter = new TopCommentedPresenter({
+const topCommentedPresenter = new MostCommentedPresenter({
   container: mainPresenter.filmWrapperComponent,
   filmsModel,
+  commentsModel,
 });
 
 render(new FooterStatisticView(), pageFooterStatistics);
