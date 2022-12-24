@@ -18,6 +18,7 @@ export default class MostCommentedPresenter {
   #filmsModel = null;
   #commentsModel = null;
 
+  #filmCards = [];
   #filmCardsCommented = [];
 
   constructor({container, filmsModel, commentsModel}) {
@@ -27,19 +28,9 @@ export default class MostCommentedPresenter {
   }
 
   init() {
-    this.#filmCardsCommented = [...this.#filmsModel.films].sort((a, b) => b.comments.length - a.comments.length);
+    this.#filmCards = [...this.#filmsModel.films];
 
-    this.#filmListCommentedComponent.element.classList.add('films-list--extra');
-    render(this.#filmListCommentedComponent, this.#container.element);
-
-    this.#filmHeaderCommentedComponent.element.innerHTML = 'Most commented';
-    this.#filmHeaderCommentedComponent.element.classList.remove('visually-hidden');
-    render(this.#filmHeaderCommentedComponent, this.#filmListCommentedComponent.element);
-
-    render(this.#filmContainerCommentedComponent, this.#filmListCommentedComponent.element);
-    for (let i = 0; i < FILM_COMMENTED_CARD_COUNT; i++) {
-      this.#renderFilmCard(this.#filmCardsCommented[i], this.#commentsModel);
-    }
+    this.#renderMostCommented();
   }
 
   #renderFilmCard(filmCard, commentsModel) {
@@ -55,5 +46,23 @@ export default class MostCommentedPresenter {
     });
 
     render(filmCardComponent, this.#filmContainerCommentedComponent.element);
+  }
+
+  #renderMostCommented() {
+    if (this.#filmCards.length > 0) {
+      this.#filmCardsCommented = this.#filmCards.sort((a, b) => b.comments.length - a.comments.length);
+
+      this.#filmListCommentedComponent.element.classList.add('films-list--extra');
+      render(this.#filmListCommentedComponent, this.#container.element);
+
+      this.#filmHeaderCommentedComponent.element.innerHTML = 'Most commented';
+      this.#filmHeaderCommentedComponent.element.classList.remove('visually-hidden');
+      render(this.#filmHeaderCommentedComponent, this.#filmListCommentedComponent.element);
+
+      render(this.#filmContainerCommentedComponent, this.#filmListCommentedComponent.element);
+      for (let i = 0; i < Math.min(this.#filmCardsCommented.length, FILM_COMMENTED_CARD_COUNT); i++) {
+        this.#renderFilmCard(this.#filmCardsCommented[i], this.#commentsModel);
+      }
+    }
   }
 }

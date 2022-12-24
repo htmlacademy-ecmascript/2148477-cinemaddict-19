@@ -18,6 +18,7 @@ export default class TopRatedPresenter {
   #filmsModel = null;
   #commentsModel = null;
 
+  #filmCards = [];
   #filmCardsRated = [];
 
   constructor({container, filmsModel, commentsModel}) {
@@ -27,19 +28,9 @@ export default class TopRatedPresenter {
   }
 
   init() {
-    this.#filmCardsRated = [...this.#filmsModel.films].sort((a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating);
+    this.#filmCards = [...this.#filmsModel.films];
 
-    this.#filmListRatedComponent.element.classList.add('films-list--extra');
-    render(this.#filmListRatedComponent, this.#container.element);
-
-    this.#filmHeaderRatedComponent.element.innerHTML = 'Top rated';
-    this.#filmHeaderRatedComponent.element.classList.remove('visually-hidden');
-    render(this.#filmHeaderRatedComponent, this.#filmListRatedComponent.element);
-
-    render(this.#filmContainerRatedComponent, this.#filmListRatedComponent.element);
-    for (let i = 0; i < FILM_RATED_CARD_COUNT; i++) {
-      this.#renderFilmCard(this.#filmCardsRated[i], this.#commentsModel);
-    }
+    this.#renderTopRated();
   }
 
   #renderFilmCard(filmCard, commentsModel) {
@@ -55,5 +46,23 @@ export default class TopRatedPresenter {
     });
 
     render(filmCardComponent, this.#filmContainerRatedComponent.element);
+  }
+
+  #renderTopRated() {
+    if (this.#filmCards.length > 0) {
+      this.#filmCardsRated = this.#filmCards.sort((a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating);
+
+      this.#filmListRatedComponent.element.classList.add('films-list--extra');
+      render(this.#filmListRatedComponent, this.#container.element);
+
+      this.#filmHeaderRatedComponent.element.innerHTML = 'Top rated';
+      this.#filmHeaderRatedComponent.element.classList.remove('visually-hidden');
+      render(this.#filmHeaderRatedComponent, this.#filmListRatedComponent.element);
+
+      render(this.#filmContainerRatedComponent, this.#filmListRatedComponent.element);
+      for (let i = 0; i < Math.min(this.#filmCardsRated.length, FILM_RATED_CARD_COUNT); i++) {
+        this.#renderFilmCard(this.#filmCardsRated[i], this.#commentsModel);
+      }
+    }
   }
 }

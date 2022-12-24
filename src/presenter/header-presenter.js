@@ -18,7 +18,8 @@ export default class HeaderPresenter {
     this.#filmCards = [...this.#filmsModel.films];
 
     this.#alreadyWatched = this.#filmCards.filter( (film) => film.userDetails.alreadyWatched).length;
-
-    render(new UserProfileView({alreadyWatched: this.#alreadyWatched}), this.#container);
+    if (this.#alreadyWatched > 0) {
+      render(new UserProfileView({alreadyWatched: this.#alreadyWatched}), this.#container);
+    }
   }
 }
