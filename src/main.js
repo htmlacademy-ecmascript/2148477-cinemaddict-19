@@ -1,13 +1,18 @@
 import FooterStatisticView from './view/footer-statistic-view.js';
 import { render } from './util/render.js';
+import { sortTopRated, sortMostCommented } from './util/sort-film-extra.js';
 
 import HeaderPresenter from './presenter/header-presenter.js';
 import FilterBarPresenter from './presenter/filters-presenter.js';
 import MainBoardPresenter from './presenter/main-board-presenter.js';
-import TopRatedPresenter from './presenter/top-rated-presenter.js';
-import MostCommentedPresenter from './presenter/most-commented-presenter.js';
+import FilmExtraPresenter from './presenter/film-extra-presenter.js';
 import FilmsModel from './model/films-model.js';
 import CommentsModel from './model/comments-model.js';
+
+const FILM_EXTRA_HEADER = {
+  topRated: 'Top Rated',
+  mostCommented: 'Most Commented',
+};
 
 const pageHeader = document.querySelector('.header');
 const pageMain = document.querySelector('.main');
@@ -29,15 +34,19 @@ const mainPresenter = new MainBoardPresenter({
   filmsModel,
   commentsModel,
 });
-const topRatedPresenter = new TopRatedPresenter({
+const topRatedPresenter = new FilmExtraPresenter({
   container: mainPresenter.filmWrapperComponent,
   filmsModel,
   commentsModel,
+  filmExtraHeader: FILM_EXTRA_HEADER.topRated,
+  filmExtraSortCB: sortTopRated,
 });
-const mostCommentedPresenter = new MostCommentedPresenter({
+const mostCommentedPresenter = new FilmExtraPresenter({
   container: mainPresenter.filmWrapperComponent,
   filmsModel,
   commentsModel,
+  filmExtraHeader: FILM_EXTRA_HEADER.mostCommented,
+  filmExtraSortCB: sortMostCommented,
 });
 
 render(new FooterStatisticView(), pageFooterStatistics);
