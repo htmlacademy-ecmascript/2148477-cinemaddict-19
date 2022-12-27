@@ -36,10 +36,6 @@ export default class UserProfileView {
   }
 
   get template() {
-    if (this.#alreadyWatched === 0) {
-      return '';
-    }
-
     return createUserProfileTemplate(this.#alreadyWatched);
   }
 
