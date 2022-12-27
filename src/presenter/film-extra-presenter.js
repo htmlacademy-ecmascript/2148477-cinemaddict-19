@@ -5,8 +5,6 @@ import FilmCardView from '../view/film-card-view.js';
 import PopupPresenter from './popup-presenter.js';
 import { render } from '../util/render.js';
 
-const FILM_EXTRA_CARD_COUNT = 2;
-
 export default class FilmExtraPresenter {
   #page = document.querySelector('.page');
 
@@ -19,15 +17,17 @@ export default class FilmExtraPresenter {
   #commentsModel = null;
 
   #filmExtraHeader = '';
+  #filmExtraCardCount = 0;
   #filmExtraSortCB = null;
 
   #filmCards = [];
   #filmExtraCards = [];
 
-  constructor({container, filmsModel, commentsModel, filmExtraHeader, filmExtraSortCB}) {
+  constructor({container, filmsModel, commentsModel, filmExtraCardCount, filmExtraHeader, filmExtraSortCB}) {
     this.#container = container;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
+    this.#filmExtraCardCount = filmExtraCardCount;
     this.#filmExtraHeader = filmExtraHeader;
     this.#filmExtraSortCB = filmExtraSortCB;
   }
@@ -65,7 +65,7 @@ export default class FilmExtraPresenter {
       render(this.#filmExtraHeaderComponent, this.#filmExtraListComponent.element);
 
       render(this.#filmExtraContainerComponent, this.#filmExtraListComponent.element);
-      for (let i = 0; i < Math.min(this.#filmExtraCards.length, FILM_EXTRA_CARD_COUNT); i++) {
+      for (let i = 0; i < Math.min(this.#filmExtraCards.length, this.#filmExtraCardCount); i++) {
         this.#renderFilmCard(this.#filmExtraCards[i], this.#commentsModel);
       }
     }

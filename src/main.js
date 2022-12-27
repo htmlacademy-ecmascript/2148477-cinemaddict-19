@@ -14,6 +14,11 @@ const FILM_EXTRA_HEADER = {
   mostCommented: 'Most Commented',
 };
 
+const FILM_EXTRA_CARD_COUNT = {
+  topRated: 2,
+  mostCommented: 2,
+};
+
 const pageHeader = document.querySelector('.header');
 const pageMain = document.querySelector('.main');
 const pageFooterStatistics = document.querySelector('.footer__statistics');
@@ -38,6 +43,7 @@ const topRatedPresenter = new FilmExtraPresenter({
   container: mainPresenter.filmWrapperComponent,
   filmsModel,
   commentsModel,
+  filmExtraCardCount: FILM_EXTRA_CARD_COUNT.topRated,
   filmExtraHeader: FILM_EXTRA_HEADER.topRated,
   filmExtraSortCB: sortTopRated,
 });
@@ -45,6 +51,7 @@ const mostCommentedPresenter = new FilmExtraPresenter({
   container: mainPresenter.filmWrapperComponent,
   filmsModel,
   commentsModel,
+  filmExtraCardCount: FILM_EXTRA_CARD_COUNT.mostCommented,
   filmExtraHeader: FILM_EXTRA_HEADER.mostCommented,
   filmExtraSortCB: sortMostCommented,
 });
