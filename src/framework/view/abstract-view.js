@@ -13,6 +13,7 @@ const SHAKE_ANIMATION_TIMEOUT = 600;
 export default class AbstractView {
   /** @type {HTMLElement|null} Элемент представления */
   #element = null;
+  _filmCard = null;
 
   /** @type {Object} Объект с колбэками. Может использоваться для хранения обработчиков событий */
   _callback = {};

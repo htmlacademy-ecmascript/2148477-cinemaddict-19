@@ -1,4 +1,4 @@
-import {createElement} from '../util/render.js';
+import AbstractView from '../framework/view/abstract-view';
 
 function createFilterBarTemplate(watchlist, alreadyWatched, favorite) {
   return (
@@ -11,14 +11,14 @@ function createFilterBarTemplate(watchlist, alreadyWatched, favorite) {
   );
 }
 
-export default class FilterBarView {
-  #element = null;
+export default class FilterBarView extends AbstractView {
   #watchlist = null;
   #alreadyWatched = null;
   #favorite = null;
 
 
   constructor({watchlist, alreadyWatched, favorite}) {
+    super();
     this.#watchlist = watchlist;
     this.#alreadyWatched = alreadyWatched;
     this.#favorite = favorite;
@@ -26,17 +26,5 @@ export default class FilterBarView {
 
   get template() {
     return createFilterBarTemplate(this.#watchlist, this.#alreadyWatched, this.#favorite);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

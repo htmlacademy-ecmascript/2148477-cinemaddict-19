@@ -3,7 +3,7 @@ import FilmListHeaderView from '../view/film-list-header-view.js';
 import FilmContainerView from '../view/film-container-view.js';
 import FilmCardView from '../view/film-card-view.js';
 import PopupPresenter from './popup-presenter.js';
-import { render } from '../util/render.js';
+import { render } from '../framework/render.js';
 
 export default class FilmExtraPresenter {
   #page = document.querySelector('.page');

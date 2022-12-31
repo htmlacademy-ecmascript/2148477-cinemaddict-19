@@ -7,7 +7,7 @@ import FilmContainerView from '../view/film-container-view.js';
 import FilmCardView from '../view/film-card-view.js';
 import ShowMoreButton from '../view/show-more-button-view.js';
 import PopupPresenter from './popup-presenter.js';
-import { render } from '../util/render.js';
+import { render } from '../framework/render.js';
 
 const FILM_CARDS_COUNT_PER_STEP = 5;
 

@@ -1,5 +1,5 @@
 import FooterStatisticView from './view/footer-statistic-view.js';
-import { render } from './util/render.js';
+import { render } from './framework/render.js';
 import { sortTopRated, sortMostCommented } from './util/sort-film-extra.js';
 
 import HeaderPresenter from './presenter/header-presenter.js';
