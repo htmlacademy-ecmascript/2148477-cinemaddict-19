@@ -34,13 +34,13 @@ const filterBarPresenter = new FilterBarPresenter({
   container: pageMain,
   filmsModel,
 });
-const mainPresenter = new MainBoardPresenter({
+const mainBoardPresenter = new MainBoardPresenter({
   container: pageMain,
   filmsModel,
   commentsModel,
 });
 const topRatedPresenter = new FilmExtraPresenter({
-  container: mainPresenter.filmWrapperComponent,
+  container: mainBoardPresenter.filmWrapperComponent,
   filmsModel,
   commentsModel,
   filmExtraCardCount: FILM_EXTRA_CARD_COUNT.topRated,
@@ -48,7 +48,7 @@ const topRatedPresenter = new FilmExtraPresenter({
   filmExtraSortCB: sortTopRated,
 });
 const mostCommentedPresenter = new FilmExtraPresenter({
-  container: mainPresenter.filmWrapperComponent,
+  container: mainBoardPresenter.filmWrapperComponent,
   filmsModel,
   commentsModel,
   filmExtraCardCount: FILM_EXTRA_CARD_COUNT.mostCommented,
@@ -60,6 +60,6 @@ render(new FooterStatisticView(), pageFooterStatistics);
 
 headerPresenter.init();
 filterBarPresenter.init();
-mainPresenter.init();
+mainBoardPresenter.init();
 topRatedPresenter.init();
 mostCommentedPresenter.init();

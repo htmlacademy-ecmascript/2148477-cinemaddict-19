@@ -86,12 +86,22 @@ function createPopupFilmDetailsTemplate(filmCard) {
 }
 
 export default class PopupFilmDetailsView extends AbstractView {
-  constructor({filmCard}) {
+  #handleClick = null;
+
+  constructor({filmCard, onClick}) {
     super();
     this._filmCard = filmCard;
+    this.#handleClick = onClick;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
+
   }
 
   get template() {
     return createPopupFilmDetailsTemplate(this._filmCard);
   }
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleClick();
+  };
 }

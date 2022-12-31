@@ -29,12 +29,21 @@ function createFilmCardTemplate(filmCard) {
 }
 
 export default class FilmCardView extends AbstractView {
-  constructor({filmCard}) {
+  #handleClick = null;
+
+  constructor({filmCard, onClick}) {
     super();
     this._filmCard = filmCard;
+    this.#handleClick = onClick;
+    this.element.querySelector('.film-card__link').addEventListener('click', this.#clickHandler);
   }
 
   get template() {
     return createFilmCardTemplate(this._filmCard);
   }
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleClick();
+  };
 }

@@ -28,7 +28,6 @@ export default class PopupPresenter {
   }
 
   init() {
-    this.#popupFilmDetailsComponent = new PopupFilmDetailsView({filmCard: this.#filmCard});
     this.#popupCommentHeaderComponent = new PopupCommentHeaderView({filmCard: this.#filmCard});
     this.#popupCommentNewComponent = new PopupCommentNewView();
 
@@ -62,10 +61,8 @@ export default class PopupPresenter {
 
     render(this.#popupComponent, this.#container);
 
+    this.#popupFilmDetailsComponent = new PopupFilmDetailsView({filmCard: this.#filmCard, onClick: removePopup});
     render(this.#popupFilmDetailsComponent, this.#popupComponent.element.firstElementChild);
-    this.#popupFilmDetailsComponent.element.querySelector('.film-details__close-btn').addEventListener('click', () => {
-      removePopup();
-    });
 
     render(this.#popupCommentContainerComponent, this.#popupComponent.element.firstElementChild);
     render(this.#popupCommentHeaderComponent, this.#popupCommentContainerComponent.element.firstElementChild);
