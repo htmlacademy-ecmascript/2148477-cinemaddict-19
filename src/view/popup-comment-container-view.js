@@ -1,4 +1,4 @@
-import {createElement} from '../util/render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createPopupCommentContainerTemplate() {
   return (
@@ -9,22 +9,8 @@ function createPopupCommentContainerTemplate() {
   );
 }
 
-export default class PopupCommentContainerView {
-  #element = null;
-
+export default class PopupCommentContainerView extends AbstractView {
   get template() {
     return createPopupCommentContainerTemplate();
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

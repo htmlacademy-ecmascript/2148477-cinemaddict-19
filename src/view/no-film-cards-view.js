@@ -1,4 +1,4 @@
-import {createElement} from '../util/render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createNoFilmCardsTemplate() {
   return (
@@ -10,22 +10,8 @@ function createNoFilmCardsTemplate() {
   );
 }
 
-export default class NoFilmCardsView {
-  #element = null;
-
+export default class NoFilmCardsView extends AbstractView {
   get template() {
     return createNoFilmCardsTemplate();
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
