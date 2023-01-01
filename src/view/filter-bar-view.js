@@ -1,30 +1,39 @@
 import AbstractView from '../framework/view/abstract-view';
 
-function createFilterBarTemplate(watchlist, alreadyWatched, favorite) {
+function createFilterBarTemplate(filterItems) {
+  const filterItemsTemplate = filterItems
+    .map((filter, index) => createFilterItemTemplate(filter, index))
+    .join('');
+
   return (
     `<nav class="main-navigation">
-      <a href="#all" class="main-navigation__item main-navigation__item--active">All movies</a>
-      <a href="#watchlist" class="main-navigation__item">Watchlist <span class="main-navigation__item-count">${watchlist}</span></a>
-      <a href="#history" class="main-navigation__item">History <span class="main-navigation__item-count">${alreadyWatched}</span></a>
-      <a href="#favorites" class="main-navigation__item">Favorites <span class="main-navigation__item-count">${favorite}</span></a>
+      ${filterItemsTemplate}
     </nav>`
   );
 }
 
+function createFilterItemTemplate(filter, isChecked) {
+  const {name, count} = filter;
+
+  return (
+    `<a
+      href="#${name.toLowerCase()}"
+      class="main-navigation__item${isChecked ? '' : ' main-navigation__item--active'}"
+    >
+      ${name === 'All' ? `${name} movies` : `${name} <span class="main-navigation__item-count">${count}</span>`}
+    </a>`
+  );
+}
+
 export default class FilterBarView extends AbstractView {
-  #watchlist = null;
-  #alreadyWatched = null;
-  #favorite = null;
+  #filters = null;
 
-
-  constructor({watchlist, alreadyWatched, favorite}) {
+  constructor({filters}) {
     super();
-    this.#watchlist = watchlist;
-    this.#alreadyWatched = alreadyWatched;
-    this.#favorite = favorite;
+    this.#filters = filters;
   }
 
   get template() {
-    return createFilterBarTemplate(this.#watchlist, this.#alreadyWatched, this.#favorite);
+    return createFilterBarTemplate(this.#filters);
   }
 }
