@@ -39,15 +39,16 @@ export default class FilmExtraPresenter {
   }
 
   #renderFilmCard(filmCard, commentsModel) {
-    const filmCardComponent = new FilmCardView({filmCard});
     const popupPresenter = new PopupPresenter({
       container: this.#page,
       filmCard,
       commentsModel
     });
-
-    filmCardComponent.element.querySelector('.film-card__link').addEventListener('click', () => {
-      popupPresenter.init();
+    const filmCardComponent = new FilmCardView({
+      filmCard,
+      onClick: () => {
+        popupPresenter.init();
+      }
     });
 
     render(filmCardComponent, this.#filmExtraContainerComponent.element);
