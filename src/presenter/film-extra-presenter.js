@@ -1,8 +1,7 @@
 import FilmListView from '../view/film-list-view.js';
 import FilmListHeaderView from '../view/film-list-header-view.js';
 import FilmContainerView from '../view/film-container-view.js';
-import FilmCardView from '../view/film-card-view.js';
-import PopupPresenter from './popup-presenter.js';
+import FilmCardPresenter from './film-card-presenter.js';
 import { render } from '../framework/render.js';
 
 export default class FilmExtraPresenter {
@@ -39,36 +38,36 @@ export default class FilmExtraPresenter {
   }
 
   #renderFilmCard(filmCard, commentsModel) {
-    const popupPresenter = new PopupPresenter({
-      container: this.#page,
-      filmCard,
-      commentsModel
-    });
-    const filmCardComponent = new FilmCardView({
-      filmCard,
-      onClick: () => {
-        popupPresenter.init();
-      }
-    });
+    const filmCardPresenter = new FilmCardPresenter({filmContainer: this.#filmExtraContainerComponent.element});
 
-    render(filmCardComponent, this.#filmExtraContainerComponent.element);
+    filmCardPresenter.init(this.#page, filmCard, commentsModel);
+
+  }
+
+  #renderFilmCards(from, to) {
+    this.#filmCards
+      .slice(from, to)
+      .forEach((filmCard) => this.#renderFilmCard(filmCard, this.#commentsModel));
+  }
+
+  #renderFilmList() {
+    this.#filmExtraListComponent.element.classList.add('films-list--extra');
+    render(this.#filmExtraListComponent, this.#container.element);
+
+    this.#filmExtraHeaderComponent.element.innerHTML = this.#filmExtraHeader;
+    this.#filmExtraHeaderComponent.element.classList.remove('visually-hidden');
+    render(this.#filmExtraHeaderComponent, this.#filmExtraListComponent.element);
+
+    render(this.#filmExtraContainerComponent, this.#filmExtraListComponent.element);
+    this.#renderFilmCards(0, Math.min(this.#filmExtraCards.length, this.#filmExtraCardCount));
+
   }
 
   #renderFilmExtra() {
     if (this.#filmCards.length > 0) {
       this.#filmExtraCards = this.#filmCards.sort(this.#filmExtraSortCB);
 
-      this.#filmExtraListComponent.element.classList.add('films-list--extra');
-      render(this.#filmExtraListComponent, this.#container.element);
-
-      this.#filmExtraHeaderComponent.element.innerHTML = this.#filmExtraHeader;
-      this.#filmExtraHeaderComponent.element.classList.remove('visually-hidden');
-      render(this.#filmExtraHeaderComponent, this.#filmExtraListComponent.element);
-
-      render(this.#filmExtraContainerComponent, this.#filmExtraListComponent.element);
-      for (let i = 0; i < Math.min(this.#filmExtraCards.length, this.#filmExtraCardCount); i++) {
-        this.#renderFilmCard(this.#filmExtraCards[i], this.#commentsModel);
-      }
+      this.#renderFilmList();
     }
   }
 }

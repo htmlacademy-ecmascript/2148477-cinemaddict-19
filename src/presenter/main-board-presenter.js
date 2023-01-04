@@ -4,10 +4,9 @@ import FilmWrapperView from '../view/film-wrapper-view.js';
 import FilmListView from '../view/film-list-view.js';
 import FilmListHeaderView from '../view/film-list-header-view.js';
 import FilmContainerView from '../view/film-container-view.js';
-import FilmCardView from '../view/film-card-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
-import PopupPresenter from './popup-presenter.js';
-import { render } from '../framework/render.js';
+import { render, RenderPosition } from '../framework/render.js';
+import FilmCardPresenter from './film-card-presenter.js';
 
 const FILM_CARDS_COUNT_PER_STEP = 5;
 
@@ -20,6 +19,8 @@ export default class MainBoardPresenter {
   #filmHeaderComponent = new FilmListHeaderView();
   #filmContainerComponent = new FilmContainerView();
   #showMoreButtonComponent = null;
+  #sortBarComponent = new SortBarView();
+  #noFilmCardsComponent = new NoFilmCardsView();
 
   #container = null;
   #filmsModel = null;
@@ -45,9 +46,7 @@ export default class MainBoardPresenter {
   }
 
   #handleShowMoreButtonClick = () => {
-    this.#filmCards
-      .slice(this.#renderedFilmCardsCount, this.#renderedFilmCardsCount + FILM_CARDS_COUNT_PER_STEP)
-      .forEach((filmCard) => this.#renderFilmCard(filmCard, this.#commentsModel));
+    this.#renderFilmCards(this.#renderedFilmCardsCount, this.#renderedFilmCardsCount + FILM_CARDS_COUNT_PER_STEP);
 
     this.#renderedFilmCardsCount += FILM_CARDS_COUNT_PER_STEP;
 
@@ -57,43 +56,52 @@ export default class MainBoardPresenter {
     }
   };
 
-  #renderFilmCard(filmCard, commentsModel) {
-    const popupPresenter = new PopupPresenter({
-      container: this.#page,
-      filmCard,
-      commentsModel
-    });
-    const filmCardComponent = new FilmCardView({
-      filmCard,
-      onClick: () => {
-        popupPresenter.init();
-      }
-    });
-
-    render(filmCardComponent, this.#filmContainerComponent.element);
+  #renderSortBar() {
+    render(this.#sortBarComponent, this.#container, RenderPosition.AFTERBEGIN);
   }
 
-  #renderMainBoard() {
-    if (this.#filmCards.length === 0) {
-      render(new NoFilmCardsView(), this.#container);
-      return;
-    }
+  #renderFilmCard(filmCard, commentsModel) {
+    const filmCardPresenter = new FilmCardPresenter({filmContainer: this.#filmContainerComponent.element});
 
-    render(new SortBarView(), this.#container);
+    filmCardPresenter.init(this.#page, filmCard, commentsModel);
+  }
 
-    render(this.#filmWrapperComponent, this.#container);
+  #renderFilmCards(from, to) {
+    this.#filmCards
+      .slice(from, to)
+      .forEach((filmCard) => this.#renderFilmCard(filmCard, this.#commentsModel));
+  }
 
-    render(this.#filmListComponent, this.#filmWrapperComponent.element);
+  #renderNoFilms() {
+    render(this.#noFilmCardsComponent, this.#filmListComponent.element, RenderPosition.AFTERBEGIN);
+  }
+
+  #renderShowMoreButton() {
+    this.#showMoreButtonComponent = new ShowMoreButtonView({onClick: this.#handleShowMoreButtonClick});
+    render(this.#showMoreButtonComponent, this.#filmListComponent.element);
+  }
+
+  #renderFilmList() {
     render(this.#filmHeaderComponent, this.#filmListComponent.element);
 
     render(this.#filmContainerComponent, this.#filmListComponent.element);
-    for (let i = 0; i < Math.min(this.#filmCards.length, FILM_CARDS_COUNT_PER_STEP); i++) {
-      this.#renderFilmCard(this.#filmCards[i], this.#commentsModel);
-    }
+    this.#renderFilmCards(0, Math.min(this.#filmCards.length, FILM_CARDS_COUNT_PER_STEP));
 
     if (this.#filmCards.length > FILM_CARDS_COUNT_PER_STEP) {
-      this.#showMoreButtonComponent = new ShowMoreButtonView({onClick: this.#handleShowMoreButtonClick});
-      render(this.#showMoreButtonComponent, this.#filmListComponent.element);
+      this.#renderShowMoreButton();
     }
+  }
+
+  #renderMainBoard() {
+    render(this.#filmWrapperComponent, this.#container);
+    render(this.#filmListComponent, this.#filmWrapperComponent.element);
+
+    if (this.#filmCards.length === 0) {
+      this.#renderNoFilms();
+      return;
+    }
+
+    this.#renderSortBar();
+    this.#renderFilmList();
   }
 }
