@@ -1,5 +1,5 @@
-import {getRandomArrayElement} from '../util/random-array-element.js';
-import {EMOTIONS} from '../util/const.js';
+import { getRandomArrayElement } from '../util/common';
+import { EMOTIONS } from '../util/const.js';
 
 const COMMENTS = [
   {

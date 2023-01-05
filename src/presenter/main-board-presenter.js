@@ -5,8 +5,11 @@ import FilmListView from '../view/film-list-view.js';
 import FilmListHeaderView from '../view/film-list-header-view.js';
 import FilmContainerView from '../view/film-container-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
-import { render, RenderPosition } from '../framework/render.js';
+
 import FilmCardPresenter from './film-card-presenter.js';
+
+import { remove, render, RenderPosition } from '../framework/render.js';
+import { updateItem } from '../util/common.js';
 
 const FILM_CARDS_COUNT_PER_STEP = 5;
 
@@ -28,6 +31,7 @@ export default class MainBoardPresenter {
 
   #filmCards = [];
   #renderedFilmCardsCount = FILM_CARDS_COUNT_PER_STEP;
+  #filmCardPresenterList = new Map();
 
   constructor({container, filmsModel, commentsModel}) {
     this.#container = container;
@@ -56,14 +60,23 @@ export default class MainBoardPresenter {
     }
   };
 
+  #handleFilmCardChange = (updatedFilmCard) => {
+    this.#filmCards = updateItem(this.#filmCards, updatedFilmCard);
+    this.#filmCardPresenterList.get(updatedFilmCard.newId).init(this.#page, updatedFilmCard, this.#commentsModel);
+  };
+
   #renderSortBar() {
     render(this.#sortBarComponent, this.#container, RenderPosition.AFTERBEGIN);
   }
 
   #renderFilmCard(filmCard, commentsModel) {
-    const filmCardPresenter = new FilmCardPresenter({filmContainer: this.#filmContainerComponent.element});
+    const filmCardPresenter = new FilmCardPresenter({
+      filmContainer: this.#filmContainerComponent.element,
+      onFilmCardChange: this.#handleFilmCardChange,
+    });
 
     filmCardPresenter.init(this.#page, filmCard, commentsModel);
+    this.#filmCardPresenterList.set(filmCard.newId, filmCardPresenter);
   }
 
   #renderFilmCards(from, to) {
@@ -90,6 +103,13 @@ export default class MainBoardPresenter {
     if (this.#filmCards.length > FILM_CARDS_COUNT_PER_STEP) {
       this.#renderShowMoreButton();
     }
+  }
+
+  #clearFilmList() {
+    this.#filmCardPresenterList.forEach((presenter) => presenter.destroy());
+    this.#filmCardPresenterList.clear();
+    this.#renderedFilmCardsCount = FILM_CARDS_COUNT_PER_STEP;
+    remove(this.#showMoreButtonComponent);
   }
 
   #renderMainBoard() {
