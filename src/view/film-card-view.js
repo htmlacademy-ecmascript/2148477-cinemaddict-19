@@ -3,8 +3,8 @@ import {getReleaseYear, getHoursMinutes} from '../util/date-time.js';
 import {getPreviewFilmDescription} from '../util/film-description.js';
 
 function createFilmCardTemplate(filmCard) {
-  const {filmInfo, comments, userDetails} = filmCard;
-
+  const {filmInfo, comments, userDetails, newId} = filmCard;
+  // getPreviewFilmDescription(filmInfo.description)
   return (
     `<article class="film-card">
       <a class="film-card__link">
@@ -16,7 +16,7 @@ function createFilmCardTemplate(filmCard) {
           <span class="film-card__genre">${filmInfo.genre[0]}</span>
         </p>
         <img src=${filmInfo.poster} alt="" class="film-card__poster">
-        <p class="film-card__description">${getPreviewFilmDescription(filmInfo.description)}</p>
+        <p class="film-card__description">${newId}</p>
         <span class="film-card__comments">${comments.length} comments</span>
       </a>
       <div class="film-card__controls">

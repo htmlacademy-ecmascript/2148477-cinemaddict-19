@@ -3,7 +3,9 @@ import FilmCardView from '../view/film-card-view.js';
 import { render, remove, replace } from '../framework/render.js';
 
 export default class FilmCardPresenter {
-  #filmContainer = null;
+  #mainContainer = null;
+  #topRatedContainer = null;
+  #mostCommentedContainer = null;
   #popupContainer = null;
   #handleFilmCardChange = null;
 
@@ -13,15 +15,17 @@ export default class FilmCardPresenter {
 
   #filmCard = null;
 
-  constructor({filmContainer, onFilmCardChange}) {
-    this.#filmContainer = filmContainer;
+  constructor({onFilmCardChange}) {
     this.#handleFilmCardChange = onFilmCardChange;
   }
 
-  init(popupContainer, filmCard, commentsModel) {
+  init({mainContainer, topRatedContainer, mostCommentedContainer, popupContainer, filmCard, commentsModel}) {
     this.#filmCard = filmCard;
     this.#popupContainer = popupContainer;
     this.#commentsModel = commentsModel;
+    this.#mainContainer = mainContainer || this.#mainContainer;
+    this.#topRatedContainer = topRatedContainer || this.#topRatedContainer;
+    this.#mostCommentedContainer = mostCommentedContainer || this.#mostCommentedContainer;
 
     const prevFilmCardComponent = this.#filmCardComponent;
 
@@ -32,19 +36,37 @@ export default class FilmCardPresenter {
     });
 
     this.#filmCardComponent = new FilmCardView({
-      filmCard,
+      filmCard: this.#filmCard,
       onFilmCardClick: this.#handleFilmCardClick,
       onWatchlistClick: this.#handleWatchlistClick,
       onAlreadyWatchedClick: this.#handleAlreadyWatchedClick,
       onFavoriteClick: this.#handleFavoriteClick,
     });
 
-    if (prevFilmCardComponent === null) {
-      render(this.#filmCardComponent, this.#filmContainer);
+    if (mainContainer) {
+      render(this.#filmCardComponent, this.#mainContainer);
       return;
     }
 
-    if (this.#filmContainer.contains(prevFilmCardComponent.element)) {
+    if (topRatedContainer) {
+      render(this.#filmCardComponent, this.#topRatedContainer);
+      return;
+    }
+
+    if (mostCommentedContainer) {
+      render(this.#filmCardComponent, this.#mostCommentedContainer);
+      return;
+    }
+
+    if (this.#mainContainer && this.#mainContainer.contains(prevFilmCardComponent.element)) {
+      replace(this.#filmCardComponent, prevFilmCardComponent);
+    }
+
+    if (this.#topRatedContainer && this.#topRatedContainer.contains(prevFilmCardComponent.element)) {
+      replace(this.#filmCardComponent, prevFilmCardComponent);
+    }
+
+    if (this.#mostCommentedContainer && this.#mostCommentedContainer.contains(prevFilmCardComponent.element)) {
       replace(this.#filmCardComponent, prevFilmCardComponent);
     }
 

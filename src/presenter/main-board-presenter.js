@@ -31,12 +31,13 @@ export default class MainBoardPresenter {
 
   #filmCards = [];
   #renderedFilmCardsCount = FILM_CARDS_COUNT_PER_STEP;
-  #filmCardPresenterList = new Map();
+  #filmCardPresenterList = null;
 
-  constructor({container, filmsModel, commentsModel}) {
+  constructor({container, filmsModel, commentsModel, filmCardPresenterList}) {
     this.#container = container;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
+    this.#filmCardPresenterList = filmCardPresenterList;
   }
 
   get filmWrapperComponent() {
@@ -62,7 +63,11 @@ export default class MainBoardPresenter {
 
   #handleFilmCardChange = (updatedFilmCard) => {
     this.#filmCards = updateItem(this.#filmCards, updatedFilmCard);
-    this.#filmCardPresenterList.get(updatedFilmCard.newId).init(this.#page, updatedFilmCard, this.#commentsModel);
+    this.#filmCardPresenterList.get(updatedFilmCard.newId).init({
+      popupContainer: this.#page,
+      filmCard: updatedFilmCard,
+      commentsModel: this.#commentsModel
+    });
   };
 
   #renderSortBar() {
@@ -70,12 +75,21 @@ export default class MainBoardPresenter {
   }
 
   #renderFilmCard(filmCard, commentsModel) {
-    const filmCardPresenter = new FilmCardPresenter({
-      filmContainer: this.#filmContainerComponent.element,
-      onFilmCardChange: this.#handleFilmCardChange,
-    });
+    const filmCardPresenter =
+      this.#filmCardPresenterList.has(filmCard.newId)
+        ?
+        this.#filmCardPresenterList.get(filmCard.newId)
+        :
+        new FilmCardPresenter({
+          onFilmCardChange: this.#handleFilmCardChange,
+        });
 
-    filmCardPresenter.init(this.#page, filmCard, commentsModel);
+    filmCardPresenter.init({
+      mainContainer: this.#filmContainerComponent.element,
+      popupContainer: this.#page,
+      filmCard,
+      commentsModel,
+    });
     this.#filmCardPresenterList.set(filmCard.newId, filmCardPresenter);
   }
 
