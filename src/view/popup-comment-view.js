@@ -1,4 +1,4 @@
-import {createElement} from '../util/render.js';
+import AbstractView from '../framework/view/abstract-view';
 import {getCommentDate} from '../util/date-time.js';
 
 function createPopupCommentTemplate(comment) {
@@ -19,27 +19,15 @@ function createPopupCommentTemplate(comment) {
   );
 }
 
-export default class PopupCommentView {
-  #element = null;
+export default class PopupCommentView extends AbstractView {
   #comment = null;
 
   constructor({comment}) {
+    super();
     this.#comment = comment;
   }
 
   get template() {
     return createPopupCommentTemplate(this.#comment);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

@@ -1,4 +1,4 @@
-import {createElement} from '../util/render.js';
+import AbstractView from '../framework/view/abstract-view';
 import {getReleaseDate, getHoursMinutes} from '../util/date-time.js';
 
 function createPopupFilmDetailsTemplate(filmCard) {
@@ -85,27 +85,24 @@ function createPopupFilmDetailsTemplate(filmCard) {
   );
 }
 
-export default class PopupFilmDetailsView {
-  #element = null;
+export default class PopupFilmDetailsView extends AbstractView {
+  #handleClick = null;
   #filmCard = null;
 
-  constructor({filmCard}) {
+  constructor({filmCard, onClick}) {
+    super();
     this.#filmCard = filmCard;
+    this.#handleClick = onClick;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
+
   }
 
   get template() {
     return createPopupFilmDetailsTemplate(this.#filmCard);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleClick();
+  };
 }

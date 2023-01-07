@@ -1,4 +1,4 @@
-import {createElement} from '../util/render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createSortBarTemplate() {
   return (
@@ -10,22 +10,8 @@ function createSortBarTemplate() {
   );
 }
 
-export default class SortBarView {
-  #element = null;
-
+export default class SortBarView extends AbstractView {
   get template() {
     return createSortBarTemplate();
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

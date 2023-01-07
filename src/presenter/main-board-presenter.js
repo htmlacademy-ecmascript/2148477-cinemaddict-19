@@ -5,9 +5,9 @@ import FilmListView from '../view/film-list-view.js';
 import FilmListHeaderView from '../view/film-list-header-view.js';
 import FilmContainerView from '../view/film-container-view.js';
 import FilmCardView from '../view/film-card-view.js';
-import ShowMoreButton from '../view/show-more-button-view.js';
+import ShowMoreButtonView from '../view/show-more-button-view.js';
 import PopupPresenter from './popup-presenter.js';
-import { render } from '../util/render.js';
+import { render } from '../framework/render.js';
 
 const FILM_CARDS_COUNT_PER_STEP = 5;
 
@@ -44,8 +44,7 @@ export default class MainBoardPresenter {
     this.#renderMainBoard();
   }
 
-  #showMoreButtonClickHandler = (evt) => {
-    evt.preventDefault();
+  #handleShowMoreButtonClick = () => {
     this.#filmCards
       .slice(this.#renderedFilmCardsCount, this.#renderedFilmCardsCount + FILM_CARDS_COUNT_PER_STEP)
       .forEach((filmCard) => this.#renderFilmCard(filmCard, this.#commentsModel));
@@ -59,15 +58,16 @@ export default class MainBoardPresenter {
   };
 
   #renderFilmCard(filmCard, commentsModel) {
-    const filmCardComponent = new FilmCardView({filmCard});
     const popupPresenter = new PopupPresenter({
       container: this.#page,
       filmCard,
       commentsModel
     });
-
-    filmCardComponent.element.querySelector('.film-card__link').addEventListener('click', () => {
-      popupPresenter.init();
+    const filmCardComponent = new FilmCardView({
+      filmCard,
+      onClick: () => {
+        popupPresenter.init();
+      }
     });
 
     render(filmCardComponent, this.#filmContainerComponent.element);
@@ -92,10 +92,8 @@ export default class MainBoardPresenter {
     }
 
     if (this.#filmCards.length > FILM_CARDS_COUNT_PER_STEP) {
-      this.#showMoreButtonComponent = new ShowMoreButton();
+      this.#showMoreButtonComponent = new ShowMoreButtonView({onClick: this.#handleShowMoreButtonClick});
       render(this.#showMoreButtonComponent, this.#filmListComponent.element);
-
-      this.#showMoreButtonComponent.element.addEventListener('click', this.#showMoreButtonClickHandler);
     }
   }
 }
