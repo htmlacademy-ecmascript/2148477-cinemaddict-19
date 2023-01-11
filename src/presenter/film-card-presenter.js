@@ -19,6 +19,8 @@ export default class FilmCardPresenter {
     this.#handleFilmCardChange = onFilmCardChange;
   }
 
+  #prevFilmCardComponent = new Map;
+
   init({mainContainer, topRatedContainer, mostCommentedContainer, popupContainer, filmCard, commentsModel}) {
     this.#filmCard = filmCard;
     this.#popupContainer = popupContainer;
@@ -26,8 +28,6 @@ export default class FilmCardPresenter {
     this.#mainContainer = mainContainer || this.#mainContainer;
     this.#topRatedContainer = topRatedContainer || this.#topRatedContainer;
     this.#mostCommentedContainer = mostCommentedContainer || this.#mostCommentedContainer;
-
-    const prevFilmCardComponent = this.#filmCardComponent;
 
     this.#popupPresenter = new PopupPresenter({
       container: this.#popupContainer,
@@ -44,6 +44,14 @@ export default class FilmCardPresenter {
     });
 
     if (mainContainer) {
+      this.#prevFilmCardComponent.set('main', this.#filmCardComponent);
+    } else if (topRatedContainer) {
+      this.#prevFilmCardComponent.set('rated', this.#filmCardComponent);
+    } else if (mostCommentedContainer) {
+      this.#prevFilmCardComponent.set('commented', this.#filmCardComponent);
+    }
+
+    if (mainContainer) {
       render(this.#filmCardComponent, this.#mainContainer);
       return;
     }
@@ -58,19 +66,22 @@ export default class FilmCardPresenter {
       return;
     }
 
-    if (this.#mainContainer && this.#mainContainer.contains(prevFilmCardComponent.element)) {
-      replace(this.#filmCardComponent, prevFilmCardComponent);
+    if (this.#mainContainer && this.#mainContainer.contains(this.#prevFilmCardComponent.get('main').element)) {
+      replace(this.#filmCardComponent, this.#prevFilmCardComponent.get('main'));
     }
 
-    if (this.#topRatedContainer && this.#topRatedContainer.contains(prevFilmCardComponent.element)) {
-      replace(this.#filmCardComponent, prevFilmCardComponent);
+    // вставляем элемент в дом
+    // а потом переставляем его в экстра
+
+    if (this.#topRatedContainer && this.#topRatedContainer.contains(this.#prevFilmCardComponent.get('rated').element)) {
+      replace(this.#filmCardComponent, this.#prevFilmCardComponent.get('rated'));
     }
 
-    if (this.#mostCommentedContainer && this.#mostCommentedContainer.contains(prevFilmCardComponent.element)) {
-      replace(this.#filmCardComponent, prevFilmCardComponent);
+    if (this.#mostCommentedContainer && this.#mostCommentedContainer.contains(this.#prevFilmCardComponent.get('commented').element)) {
+      replace(this.#filmCardComponent, this.#prevFilmCardComponent.get('commented'));
     }
 
-    remove(prevFilmCardComponent);
+    this.#prevFilmCardComponent.forEach(remove);
   }
 
   destroy() {
