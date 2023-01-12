@@ -33,6 +33,7 @@ export default class FilmCardView extends AbstractView {
   #handleWatchlistClick = null;
   #handleAlreadyWatchedClick = null;
   #handleFavoriteClick = null;
+  #filmCard = null;
 
   constructor({filmCard, onFilmCardClick, onWatchlistClick, onAlreadyWatchedClick, onFavoriteClick}) {
     super();
