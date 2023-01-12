@@ -45,42 +45,42 @@ export default class FilmExtraPresenter {
 
   #handleFilmCardChange = (updatedFilmCard) => {
     this.#filmCards = updateItem(this.#filmCards, updatedFilmCard);
-    this.#filmCardPresenterList.get(updatedFilmCard.newId).init({
-      popupContainer: this.#page,
-      filmCard: updatedFilmCard,
-      commentsModel: this.#commentsModel
-    });
+    this.#filmCardPresenterList.get(updatedFilmCard.newId).forEach(
+      (presenter) => presenter.init({
+        popupContainer: this.#page,
+        filmCard: updatedFilmCard,
+        commentsModel: this.#commentsModel
+      })
+    );
   };
 
 
   #renderFilmCard(filmCard, commentsModel) {
-    const filmCardPresenter =
-      this.#filmCardPresenterList.has(filmCard.newId)
-        ?
-        this.#filmCardPresenterList.get(filmCard.newId)
-        :
-        new FilmCardPresenter({
-          onFilmCardChange: this.#handleFilmCardChange,
-        });
+    const filmCardPresenter = new FilmCardPresenter({
+      onFilmCardChange: this.#handleFilmCardChange,
+      filmCardContainer: this.#filmExtraContainerComponent.element,
+    });
 
-    if (this.#filmExtraHeader === 'Top Rated') {
-      filmCardPresenter.init({
-        topRatedContainer: this.#filmExtraContainerComponent.element,
-        popupContainer: this.#page,
-        filmCard,
-        commentsModel,
-      });
+    filmCardPresenter.init({
+      popupContainer: this.#page,
+      filmCard,
+      commentsModel,
+    });
+
+    if ( this.#filmCardPresenterList.has(filmCard.newId) ) {
+      const arr = this.#filmCardPresenterList.get(filmCard.newId);
+      arr.push(filmCardPresenter);
+      this.#filmCardPresenterList.set(
+        filmCard.newId,
+        arr,
+      );
+      return;
     }
 
-    if (this.#filmExtraHeader === 'Most Commented') {
-      filmCardPresenter.init({
-        mostCommentedContainer: this.#filmExtraContainerComponent.element,
-        popupContainer: this.#page,
-        filmCard,
-        commentsModel,
-      });
-    }
-    this.#filmCardPresenterList.set(filmCard.newId, filmCardPresenter);
+    const newArr = [];
+    newArr.push(filmCardPresenter);
+    this.#filmCardPresenterList.set(filmCard.newId, newArr);
+
   }
 
   #renderFilmCards(from, to) {

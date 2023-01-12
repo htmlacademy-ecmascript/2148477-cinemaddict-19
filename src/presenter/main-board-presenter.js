@@ -25,6 +25,7 @@ export default class MainBoardPresenter {
   #sortBarComponent = new SortBarView();
   #noFilmCardsComponent = new NoFilmCardsView();
 
+
   #container = null;
   #filmsModel = null;
   #commentsModel = null;
@@ -63,11 +64,13 @@ export default class MainBoardPresenter {
 
   #handleFilmCardChange = (updatedFilmCard) => {
     this.#filmCards = updateItem(this.#filmCards, updatedFilmCard);
-    this.#filmCardPresenterList.get(updatedFilmCard.newId).init({
-      popupContainer: this.#page,
-      filmCard: updatedFilmCard,
-      commentsModel: this.#commentsModel
-    });
+    this.#filmCardPresenterList.get(updatedFilmCard.newId).forEach(
+      (presenter) => presenter.init({
+        popupContainer: this.#page,
+        filmCard: updatedFilmCard,
+        commentsModel: this.#commentsModel
+      })
+    );
   };
 
   #renderSortBar() {
@@ -75,22 +78,30 @@ export default class MainBoardPresenter {
   }
 
   #renderFilmCard(filmCard, commentsModel) {
-    const filmCardPresenter =
-      this.#filmCardPresenterList.has(filmCard.newId)
-        ?
-        this.#filmCardPresenterList.get(filmCard.newId)
-        :
-        new FilmCardPresenter({
-          onFilmCardChange: this.#handleFilmCardChange,
-        });
+    const filmCardPresenter = new FilmCardPresenter({
+      onFilmCardChange: this.#handleFilmCardChange,
+      filmCardContainer: this.#filmContainerComponent.element,
+    });
 
     filmCardPresenter.init({
-      mainContainer: this.#filmContainerComponent.element,
       popupContainer: this.#page,
       filmCard,
       commentsModel,
     });
-    this.#filmCardPresenterList.set(filmCard.newId, filmCardPresenter);
+
+    if ( this.#filmCardPresenterList.has(filmCard.newId) ) {
+      const arr = this.#filmCardPresenterList.get(filmCard.newId);
+      arr.push(filmCardPresenter);
+      this.#filmCardPresenterList.set(
+        filmCard.newId,
+        arr,
+      );
+      return;
+    }
+
+    const newArr = [];
+    newArr.push(filmCardPresenter);
+    this.#filmCardPresenterList.set(filmCard.newId, newArr);
   }
 
   #renderFilmCards(from, to) {
