@@ -1,5 +1,3 @@
-import FooterStatisticView from './view/footer-statistic-view.js';
-import { render } from './framework/render.js';
 import { sortTopRated, sortMostCommented } from './util/sort-film-extra.js';
 
 import HeaderPresenter from './presenter/header-presenter.js';
@@ -8,6 +6,7 @@ import MainBoardPresenter from './presenter/main-board-presenter.js';
 import FilmExtraPresenter from './presenter/film-extra-presenter.js';
 import FilmsModel from './model/films-model.js';
 import CommentsModel from './model/comments-model.js';
+import FooterStatisticPresenter from './presenter/footer-statistic-presenter.js';
 
 const FILM_EXTRA_HEADER = {
   topRated: 'Top Rated',
@@ -55,11 +54,14 @@ const mostCommentedPresenter = new FilmExtraPresenter({
   filmExtraHeader: FILM_EXTRA_HEADER.mostCommented,
   filmExtraSortCB: sortMostCommented,
 });
-
-render(new FooterStatisticView(), pageFooterStatistics);
+const footerStatisticPresenter = new FooterStatisticPresenter({
+  container: pageFooterStatistics,
+  filmsModel,
+});
 
 headerPresenter.init();
 filterBarPresenter.init();
 mainBoardPresenter.init();
 topRatedPresenter.init();
 mostCommentedPresenter.init();
+footerStatisticPresenter.init();

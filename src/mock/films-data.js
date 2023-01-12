@@ -1,5 +1,5 @@
 import {getRandomArrayElement} from '../util/random-array-element.js';
-import {POSTERS} from '../const.js';
+import {POSTERS} from '../util/const.js';
 
 const FILMS = [
   {
