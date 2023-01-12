@@ -5,12 +5,14 @@ function createPopupCommentHeaderTemplate(filmCard) {
 }
 
 export default class PopupCommentHeaderView extends AbstractView {
+  #filmCard = null;
+
   constructor({filmCard}) {
     super();
-    this._filmCard = filmCard;
+    this.#filmCard = filmCard;
   }
 
   get template() {
-    return createPopupCommentHeaderTemplate(this._filmCard);
+    return createPopupCommentHeaderTemplate(this.#filmCard);
   }
 }

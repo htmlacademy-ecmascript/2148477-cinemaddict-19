@@ -37,7 +37,7 @@ export default class FilmCardView extends AbstractView {
   constructor({filmCard, onFilmCardClick, onWatchlistClick, onAlreadyWatchedClick, onFavoriteClick}) {
     super();
 
-    this._filmCard = filmCard;
+    this.#filmCard = filmCard;
 
     this.#handleFilmCardClick = onFilmCardClick;
     this.element.querySelector('.film-card__link').addEventListener('click', this.#filmCardClickHandler);
@@ -53,7 +53,7 @@ export default class FilmCardView extends AbstractView {
   }
 
   get template() {
-    return createFilmCardTemplate(this._filmCard);
+    return createFilmCardTemplate(this.#filmCard);
   }
 
   #filmCardClickHandler = (evt) => {
