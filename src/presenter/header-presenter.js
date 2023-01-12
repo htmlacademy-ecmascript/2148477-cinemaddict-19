@@ -9,9 +9,9 @@ export default class HeaderPresenter {
 
   #alreadyWatched = 0;
 
-  constructor({container, filmCards}) {
+  constructor({container, filmsModel}) {
     this.#container = container;
-    this.#filmCards = filmCards;
+    this.#filmsModel = filmsModel;
   }
 
   init() {
