@@ -1,11 +1,7 @@
 import PopupPresenter from './popup-presenter.js';
 import FilmCardView from '../view/film-card-view.js';
 import { render, remove, replace } from '../framework/render.js';
-
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  POPUP: 'POPUP',
-};
+import { Mode } from '../util/const.js';
 
 export default class FilmCardPresenter {
   #popupContainer = null;

@@ -6,6 +6,7 @@ import PopupCommentListView from '../view/popup-comment-list-view.js';
 import PopupCommentNewView from '../view/popup-comment-new-view.js';
 import PopupCommentView from '../view/popup-comment-view.js';
 import { render, remove } from '../framework/render.js';
+import { Mode } from '../util/const.js';
 
 export default class PopupPresenter {
   #popupComponent = new PopupView();
@@ -51,7 +52,7 @@ export default class PopupPresenter {
       onFavoriteClick: this.#favoriteClickHandler,
     });
 
-    if (this.#mode === 'DEFAULT') {
+    if (this.#mode === Mode.DEFAULT) {
       this.#container.classList.add('hide-overflow');
       this.#container.addEventListener('keydown', this.#escKeyDownHandler);
 

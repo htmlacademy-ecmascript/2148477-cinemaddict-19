@@ -76,18 +76,18 @@ export default class FilmExtraPresenter {
     });
 
     if ( this.#filmCardPresenterList.has(filmCard.newId) ) {
-      const sameCardPresentersArrToUpdate = this.#filmCardPresenterList.get(filmCard.newId);
-      sameCardPresentersArrToUpdate.push(filmCardPresenter);
+      const updatedSameCardPresenters = this.#filmCardPresenterList.get(filmCard.newId);
+      updatedSameCardPresenters.push(filmCardPresenter);
       this.#filmCardPresenterList.set(
         filmCard.newId,
-        sameCardPresentersArrToUpdate,
+        updatedSameCardPresenters,
       );
       return;
     }
 
-    const sameCardPresentersArr = [];
-    sameCardPresentersArr.push(filmCardPresenter);
-    this.#filmCardPresenterList.set(filmCard.newId, sameCardPresentersArr);
+    const sameCardPresenters = [];
+    sameCardPresenters.push(filmCardPresenter);
+    this.#filmCardPresenterList.set(filmCard.newId, sameCardPresenters);
 
   }
 

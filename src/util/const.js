@@ -22,4 +22,9 @@ const FilterType = {
   FAVORITES: 'Favorites',
 };
 
-export {POSTERS, EMOTIONS, FilterType};
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  POPUP: 'POPUP',
+};
+
+export {POSTERS, EMOTIONS, FilterType, Mode};
