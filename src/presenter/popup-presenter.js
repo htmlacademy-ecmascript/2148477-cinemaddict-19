@@ -20,7 +20,6 @@ export default class PopupPresenter {
   #handleFavoriteClick = null;
   #handlePopupRemoval = null;
   #mode = null;
-  #previousPopup = null;
 
   #popupFilmDetailsComponent = null;
   #popupCommentHeaderComponent = null;
@@ -36,11 +35,10 @@ export default class PopupPresenter {
     this.#handleFavoriteClick = onFavoriteClick;
   }
 
-  init({filmCard, onPopupRemove, mode, previousPopup}) {
+  init({filmCard, onPopupRemove, mode}) {
     this.#filmCard = filmCard;
     this.#handlePopupRemoval = onPopupRemove;
     this.#mode = mode;
-    this.#previousPopup = previousPopup;
 
     this.#popupCommentHeaderComponent = new PopupCommentHeaderView({filmCard: this.#filmCard});
     this.#popupCommentNewComponent = new PopupCommentNewView();
@@ -78,18 +76,14 @@ export default class PopupPresenter {
       }
 
       render(this.#popupCommentNewComponent, this.#popupCommentContainerComponent.element.firstElementChild);
-      return;
+      // return;
     }
 
-    if (this.#mode === 'POPUP') {
-      replace(this.#popupFilmDetailsComponent, this.#previousPopup.filmDetailsComponent);
-    }
+    // if (this.#mode === 'POPUP') {
+    //   replace(this.#popupFilmDetailsComponent, this.#previousPopup.filmDetailsComponent);
+    // }
 
-    remove(this.#previousPopup.filmDetailsComponent);
-  }
-
-  get filmDetailsComponent () {
-    return this.#popupFilmDetailsComponent;
+    // remove(this.#previousPopup.filmDetailsComponent);
   }
 
   removePopup = () => {

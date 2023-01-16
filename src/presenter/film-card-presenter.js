@@ -67,7 +67,6 @@ export default class FilmCardPresenter {
         filmCard: this.#filmCard,
         onPopupRemove: this.#resetMode,
         mode: this.#mode,
-        previousPopup: prevPopupPresenter,
       });
       this.#mode = Mode.POPUP;
     }
