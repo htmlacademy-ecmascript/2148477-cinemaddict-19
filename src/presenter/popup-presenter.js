@@ -5,7 +5,7 @@ import PopupCommentHeaderView from '../view/popup-comment-header-view.js';
 import PopupCommentListView from '../view/popup-comment-list-view.js';
 import PopupCommentNewView from '../view/popup-comment-new-view.js';
 import PopupCommentView from '../view/popup-comment-view.js';
-import { render, replace, remove } from '../framework/render.js';
+import { render, remove } from '../framework/render.js';
 
 export default class PopupPresenter {
   #popupComponent = new PopupView();
