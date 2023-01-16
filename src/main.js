@@ -22,6 +22,9 @@ const pageHeader = document.querySelector('.header');
 const pageMain = document.querySelector('.main');
 const pageFooterStatistics = document.querySelector('.footer__statistics');
 
+const filmCardPresenterList = new Map();
+
+
 const filmsModel = new FilmsModel();
 const commentsModel = new CommentsModel();
 
@@ -37,6 +40,7 @@ const mainBoardPresenter = new MainBoardPresenter({
   container: pageMain,
   filmsModel,
   commentsModel,
+  filmCardPresenterList,
 });
 const topRatedPresenter = new FilmExtraPresenter({
   container: mainBoardPresenter.filmWrapperComponent,
@@ -45,6 +49,7 @@ const topRatedPresenter = new FilmExtraPresenter({
   filmExtraCardCount: FILM_EXTRA_CARD_COUNT.topRated,
   filmExtraHeader: FILM_EXTRA_HEADER.topRated,
   filmExtraSortCB: sortTopRated,
+  filmCardPresenterList,
 });
 const mostCommentedPresenter = new FilmExtraPresenter({
   container: mainBoardPresenter.filmWrapperComponent,
@@ -53,6 +58,7 @@ const mostCommentedPresenter = new FilmExtraPresenter({
   filmExtraCardCount: FILM_EXTRA_CARD_COUNT.mostCommented,
   filmExtraHeader: FILM_EXTRA_HEADER.mostCommented,
   filmExtraSortCB: sortMostCommented,
+  filmCardPresenterList,
 });
 const footerStatisticPresenter = new FooterStatisticPresenter({
   container: pageFooterStatistics,

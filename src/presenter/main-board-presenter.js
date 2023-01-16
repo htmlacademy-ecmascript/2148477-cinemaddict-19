@@ -4,10 +4,12 @@ import FilmWrapperView from '../view/film-wrapper-view.js';
 import FilmListView from '../view/film-list-view.js';
 import FilmListHeaderView from '../view/film-list-header-view.js';
 import FilmContainerView from '../view/film-container-view.js';
-import FilmCardView from '../view/film-card-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
-import PopupPresenter from './popup-presenter.js';
-import { render } from '../framework/render.js';
+
+import FilmCardPresenter from './film-card-presenter.js';
+
+import { remove, render, RenderPosition } from '../framework/render.js';
+import { updateItem } from '../util/common.js';
 
 const FILM_CARDS_COUNT_PER_STEP = 5;
 
@@ -20,6 +22,9 @@ export default class MainBoardPresenter {
   #filmHeaderComponent = new FilmListHeaderView();
   #filmContainerComponent = new FilmContainerView();
   #showMoreButtonComponent = null;
+  #sortBarComponent = new SortBarView();
+  #noFilmCardsComponent = new NoFilmCardsView();
+
 
   #container = null;
   #filmsModel = null;
@@ -27,11 +32,13 @@ export default class MainBoardPresenter {
 
   #filmCards = [];
   #renderedFilmCardsCount = FILM_CARDS_COUNT_PER_STEP;
+  #filmCardPresenterList = null;
 
-  constructor({container, filmsModel, commentsModel}) {
+  constructor({container, filmsModel, commentsModel, filmCardPresenterList}) {
     this.#container = container;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
+    this.#filmCardPresenterList = filmCardPresenterList;
   }
 
   get filmWrapperComponent() {
@@ -45,9 +52,8 @@ export default class MainBoardPresenter {
   }
 
   #handleShowMoreButtonClick = () => {
-    this.#filmCards
-      .slice(this.#renderedFilmCardsCount, this.#renderedFilmCardsCount + FILM_CARDS_COUNT_PER_STEP)
-      .forEach((filmCard) => this.#renderFilmCard(filmCard, this.#commentsModel));
+    this.#filmCards = [...this.#filmsModel.films];
+    this.#renderFilmCards(this.#renderedFilmCardsCount, this.#renderedFilmCardsCount + FILM_CARDS_COUNT_PER_STEP);
 
     this.#renderedFilmCardsCount += FILM_CARDS_COUNT_PER_STEP;
 
@@ -57,43 +63,100 @@ export default class MainBoardPresenter {
     }
   };
 
-  #renderFilmCard(filmCard, commentsModel) {
-    const popupPresenter = new PopupPresenter({
-      container: this.#page,
-      filmCard,
-      commentsModel
-    });
-    const filmCardComponent = new FilmCardView({
-      filmCard,
-      onClick: () => {
-        popupPresenter.init();
-      }
-    });
+  #handleFilmCardChange = (updatedFilmCard) => {
+    updateItem(this.#filmCards, updatedFilmCard);
+    this.#filmCardPresenterList.get(updatedFilmCard.newId).forEach(
+      (presenter) => presenter.init({
+        popupContainer: this.#page,
+        filmCard: updatedFilmCard,
+        commentsModel: this.#commentsModel
+      })
+    );
+  };
 
-    render(filmCardComponent, this.#filmContainerComponent.element);
+  #handleModeChange = () => {
+    this.#filmCardPresenterList.forEach(
+      (presentersArr) => presentersArr.forEach(
+        (presenter) => presenter.resetView()
+      )
+    );
+  };
+
+  #renderSortBar() {
+    render(this.#sortBarComponent, this.#container, RenderPosition.AFTERBEGIN);
   }
 
-  #renderMainBoard() {
-    if (this.#filmCards.length === 0) {
-      render(new NoFilmCardsView(), this.#container);
+  #renderFilmCard(filmCard, commentsModel) {
+    const filmCardPresenter = new FilmCardPresenter({
+      onFilmCardChange: this.#handleFilmCardChange,
+      filmCardContainer: this.#filmContainerComponent.element,
+      onModeChange: this.#handleModeChange,
+    });
+
+    filmCardPresenter.init({
+      popupContainer: this.#page,
+      filmCard,
+      commentsModel,
+    });
+
+    if ( this.#filmCardPresenterList.has(filmCard.newId) ) {
+      const updatedSameCardPresenters = this.#filmCardPresenterList.get(filmCard.newId);
+      updatedSameCardPresenters.push(filmCardPresenter);
+      this.#filmCardPresenterList.set(
+        filmCard.newId,
+        updatedSameCardPresenters,
+      );
       return;
     }
 
-    render(new SortBarView(), this.#container);
+    const sameCardPresenters = [];
+    sameCardPresenters.push(filmCardPresenter);
+    this.#filmCardPresenterList.set(filmCard.newId, sameCardPresenters);
+  }
 
-    render(this.#filmWrapperComponent, this.#container);
+  #renderFilmCards(from, to) {
+    this.#filmCards
+      .slice(from, to)
+      .forEach((filmCard) => this.#renderFilmCard(filmCard, this.#commentsModel));
+  }
 
-    render(this.#filmListComponent, this.#filmWrapperComponent.element);
+  #renderNoFilms() {
+    render(this.#noFilmCardsComponent, this.#filmListComponent.element, RenderPosition.AFTERBEGIN);
+  }
+
+  #renderShowMoreButton() {
+    this.#showMoreButtonComponent = new ShowMoreButtonView({onClick: this.#handleShowMoreButtonClick});
+    render(this.#showMoreButtonComponent, this.#filmListComponent.element);
+  }
+
+  #renderFilmList() {
     render(this.#filmHeaderComponent, this.#filmListComponent.element);
 
     render(this.#filmContainerComponent, this.#filmListComponent.element);
-    for (let i = 0; i < Math.min(this.#filmCards.length, FILM_CARDS_COUNT_PER_STEP); i++) {
-      this.#renderFilmCard(this.#filmCards[i], this.#commentsModel);
-    }
+    this.#renderFilmCards(0, Math.min(this.#filmCards.length, FILM_CARDS_COUNT_PER_STEP));
 
     if (this.#filmCards.length > FILM_CARDS_COUNT_PER_STEP) {
-      this.#showMoreButtonComponent = new ShowMoreButtonView({onClick: this.#handleShowMoreButtonClick});
-      render(this.#showMoreButtonComponent, this.#filmListComponent.element);
+      this.#renderShowMoreButton();
     }
+  }
+
+  #clearFilmList() {
+    this.#filmCardPresenterList.forEach((presenter) => presenter.destroy());
+    this.#filmCardPresenterList.clear();
+    this.#renderedFilmCardsCount = FILM_CARDS_COUNT_PER_STEP;
+    remove(this.#showMoreButtonComponent);
+  }
+
+  #renderMainBoard() {
+    render(this.#filmWrapperComponent, this.#container);
+    render(this.#filmListComponent, this.#filmWrapperComponent.element);
+
+    if (this.#filmCards.length === 0) {
+      this.#renderNoFilms();
+      return;
+    }
+
+    this.#renderSortBar();
+    this.#renderFilmList();
   }
 }

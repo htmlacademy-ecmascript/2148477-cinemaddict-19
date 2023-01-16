@@ -1,5 +1,6 @@
-import {getRandomArrayElement} from '../util/random-array-element.js';
-import {POSTERS} from '../util/const.js';
+import { nanoid } from 'nanoid';
+import { getRandomArrayElement } from '../util/common.js';
+import { POSTERS } from '../util/const.js';
 
 const FILMS = [
   {
@@ -257,7 +258,10 @@ const FILMS = [
 ];
 
 function getRandomFilmData() {
-  return getRandomArrayElement(FILMS);
+  return {
+    newId: nanoid(),
+    ...getRandomArrayElement(FILMS)
+  };
 }
 
 export {getRandomFilmData};

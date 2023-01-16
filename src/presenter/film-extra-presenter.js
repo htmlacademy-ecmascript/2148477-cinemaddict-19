@@ -1,9 +1,11 @@
 import FilmListView from '../view/film-list-view.js';
 import FilmListHeaderView from '../view/film-list-header-view.js';
 import FilmContainerView from '../view/film-container-view.js';
-import FilmCardView from '../view/film-card-view.js';
-import PopupPresenter from './popup-presenter.js';
+
+import FilmCardPresenter from './film-card-presenter.js';
+
 import { render } from '../framework/render.js';
+import { updateItem } from '../util/common.js';
 
 export default class FilmExtraPresenter {
   #page = document.querySelector('.page');
@@ -23,13 +25,16 @@ export default class FilmExtraPresenter {
   #filmCards = [];
   #filmExtraCards = [];
 
-  constructor({container, filmsModel, commentsModel, filmExtraCardCount, filmExtraHeader, filmExtraSortCB}) {
+  #filmCardPresenterList = null;
+
+  constructor({container, filmsModel, commentsModel, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList}) {
     this.#container = container;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
     this.#filmExtraCardCount = filmExtraCardCount;
     this.#filmExtraHeader = filmExtraHeader;
     this.#filmExtraSortCB = filmExtraSortCB;
+    this.#filmCardPresenterList = filmCardPresenterList;
   }
 
   init() {
@@ -38,37 +43,83 @@ export default class FilmExtraPresenter {
     this.#renderFilmExtra();
   }
 
+  #handleFilmCardChange = (updatedFilmCard) => {
+    updateItem(this.#filmCards, updatedFilmCard);
+    this.#filmCardPresenterList.get(updatedFilmCard.newId).forEach(
+      (presenter) => presenter.init({
+        popupContainer: this.#page,
+        filmCard: updatedFilmCard,
+        commentsModel: this.#commentsModel
+      })
+    );
+  };
+
+  #handleModeChange = () => {
+    this.#filmCardPresenterList.forEach(
+      (presentersArr) => presentersArr.forEach(
+        (presenter) => presenter.resetView()
+      )
+    );
+  };
+
   #renderFilmCard(filmCard, commentsModel) {
-    const popupPresenter = new PopupPresenter({
-      container: this.#page,
-      filmCard,
-      commentsModel
-    });
-    const filmCardComponent = new FilmCardView({
-      filmCard,
-      onClick: () => {
-        popupPresenter.init();
-      }
+    const filmCardPresenter = new FilmCardPresenter({
+      onFilmCardChange: this.#handleFilmCardChange,
+      filmCardContainer: this.#filmExtraContainerComponent.element,
+      onModeChange: this.#handleModeChange,
     });
 
-    render(filmCardComponent, this.#filmExtraContainerComponent.element);
+    filmCardPresenter.init({
+      popupContainer: this.#page,
+      filmCard,
+      commentsModel,
+    });
+
+    if ( this.#filmCardPresenterList.has(filmCard.newId) ) {
+      const updatedSameCardPresenters = this.#filmCardPresenterList.get(filmCard.newId);
+      updatedSameCardPresenters.push(filmCardPresenter);
+      this.#filmCardPresenterList.set(
+        filmCard.newId,
+        updatedSameCardPresenters,
+      );
+      return;
+    }
+
+    const sameCardPresenters = [];
+    sameCardPresenters.push(filmCardPresenter);
+    this.#filmCardPresenterList.set(filmCard.newId, sameCardPresenters);
+
   }
+
+  #renderFilmCards(from, to) {
+    this.#filmCards
+      .slice(from, to)
+      .forEach((filmCard) => this.#renderFilmCard(filmCard, this.#commentsModel));
+  }
+
+  #renderFilmList() {
+    this.#filmExtraListComponent.element.classList.add('films-list--extra');
+    render(this.#filmExtraListComponent, this.#container.element);
+
+    this.#filmExtraHeaderComponent.element.innerHTML = this.#filmExtraHeader;
+    this.#filmExtraHeaderComponent.element.classList.remove('visually-hidden');
+    render(this.#filmExtraHeaderComponent, this.#filmExtraListComponent.element);
+
+    render(this.#filmExtraContainerComponent, this.#filmExtraListComponent.element);
+    this.#renderFilmCards(0, Math.min(this.#filmExtraCards.length, this.#filmExtraCardCount));
+  }
+
+  #clearFilmList() {
+    this.#filmCardPresenterList.forEach((presenter) => presenter.destroy());
+    this.#filmCardPresenterList.clear();
+  }
+
 
   #renderFilmExtra() {
     if (this.#filmCards.length > 0) {
       this.#filmExtraCards = this.#filmCards.sort(this.#filmExtraSortCB);
 
-      this.#filmExtraListComponent.element.classList.add('films-list--extra');
-      render(this.#filmExtraListComponent, this.#container.element);
-
-      this.#filmExtraHeaderComponent.element.innerHTML = this.#filmExtraHeader;
-      this.#filmExtraHeaderComponent.element.classList.remove('visually-hidden');
-      render(this.#filmExtraHeaderComponent, this.#filmExtraListComponent.element);
-
-      render(this.#filmExtraContainerComponent, this.#filmExtraListComponent.element);
-      for (let i = 0; i < Math.min(this.#filmExtraCards.length, this.#filmExtraCardCount); i++) {
-        this.#renderFilmCard(this.#filmExtraCards[i], this.#commentsModel);
-      }
+      this.#renderFilmList();
     }
   }
 }
