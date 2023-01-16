@@ -54,11 +54,19 @@ export default class FilmExtraPresenter {
     );
   };
 
+  #handleModeChange = () => {
+    this.#filmCardPresenterList.forEach(
+      (presentersArr) => presentersArr.forEach(
+        (presenter) => presenter.resetView()
+      )
+    );
+  };
 
   #renderFilmCard(filmCard, commentsModel) {
     const filmCardPresenter = new FilmCardPresenter({
       onFilmCardChange: this.#handleFilmCardChange,
       filmCardContainer: this.#filmExtraContainerComponent.element,
+      onModeChange: this.#handleModeChange,
     });
 
     filmCardPresenter.init({
