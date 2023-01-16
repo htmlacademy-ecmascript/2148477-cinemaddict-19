@@ -51,10 +51,6 @@ export default class PopupPresenter {
       onFavoriteClick: this.#favoriteClickHandler,
     });
 
-    // когда мы открываем попап во второй раз,
-    // элемент не будет null.
-    // надо привязываться к Mode
-
     if (this.#mode === 'DEFAULT') {
       this.#container.classList.add('hide-overflow');
       this.#container.addEventListener('keydown', this.#escKeyDownHandler);
@@ -76,14 +72,7 @@ export default class PopupPresenter {
       }
 
       render(this.#popupCommentNewComponent, this.#popupCommentContainerComponent.element.firstElementChild);
-      // return;
     }
-
-    // if (this.#mode === 'POPUP') {
-    //   replace(this.#popupFilmDetailsComponent, this.#previousPopup.filmDetailsComponent);
-    // }
-
-    // remove(this.#previousPopup.filmDetailsComponent);
   }
 
   removePopup = () => {
