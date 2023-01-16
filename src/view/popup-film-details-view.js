@@ -86,23 +86,50 @@ function createPopupFilmDetailsTemplate(filmCard) {
 }
 
 export default class PopupFilmDetailsView extends AbstractView {
-  #handleClick = null;
+  #handleXClick = null;
   #filmCard = null;
+  #handleWatchlistClick = null;
+  #handleAlreadyWatchedClick = null;
+  #handleFavoriteClick = null;
 
-  constructor({filmCard, onClick}) {
+  constructor({filmCard, onXClick, onWatchlistClick, onAlreadyWatchedClick, onFavoriteClick}) {
     super();
     this.#filmCard = filmCard;
-    this.#handleClick = onClick;
-    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
 
+    this.#handleXClick = onXClick;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#xClickHandler);
+
+    this.#handleWatchlistClick = onWatchlistClick;
+    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchlistClickHandler);
+
+    this.#handleAlreadyWatchedClick = onAlreadyWatchedClick;
+    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#alreadyWatchedClickHandler);
+
+    this.#handleFavoriteClick = onFavoriteClick;
+    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
   }
 
   get template() {
     return createPopupFilmDetailsTemplate(this.#filmCard);
   }
 
-  #clickHandler = (evt) => {
+  #xClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleClick();
+    this.#handleXClick();
+  };
+
+  #watchlistClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleWatchlistClick();
+  };
+
+  #alreadyWatchedClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleAlreadyWatchedClick();
+  };
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFavoriteClick();
   };
 }

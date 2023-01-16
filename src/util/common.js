@@ -3,7 +3,11 @@ function getRandomArrayElement(arr) {
 }
 
 function updateItem(items, update) {
-  return items.map((item) => item.newId === update.newId ? update : item);
+  return items.forEach((item) => {
+    if (item.newId === update.newId){
+      item.userDetails = update.userDetails;
+    }
+  });
 }
 
 export {getRandomArrayElement, updateItem};

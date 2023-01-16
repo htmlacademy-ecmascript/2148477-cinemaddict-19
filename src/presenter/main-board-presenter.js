@@ -52,6 +52,7 @@ export default class MainBoardPresenter {
   }
 
   #handleShowMoreButtonClick = () => {
+    this.#filmCards = [...this.#filmsModel.films];
     this.#renderFilmCards(this.#renderedFilmCardsCount, this.#renderedFilmCardsCount + FILM_CARDS_COUNT_PER_STEP);
 
     this.#renderedFilmCardsCount += FILM_CARDS_COUNT_PER_STEP;
@@ -63,13 +64,21 @@ export default class MainBoardPresenter {
   };
 
   #handleFilmCardChange = (updatedFilmCard) => {
-    this.#filmCards = updateItem(this.#filmCards, updatedFilmCard);
+    updateItem(this.#filmCards, updatedFilmCard);
     this.#filmCardPresenterList.get(updatedFilmCard.newId).forEach(
       (presenter) => presenter.init({
         popupContainer: this.#page,
         filmCard: updatedFilmCard,
         commentsModel: this.#commentsModel
       })
+    );
+  };
+
+  #handleModeChange = () => {
+    this.#filmCardPresenterList.forEach(
+      (presentersArr) => presentersArr.forEach(
+        (presenter) => presenter.resetView()
+      )
     );
   };
 
@@ -81,6 +90,7 @@ export default class MainBoardPresenter {
     const filmCardPresenter = new FilmCardPresenter({
       onFilmCardChange: this.#handleFilmCardChange,
       filmCardContainer: this.#filmContainerComponent.element,
+      onModeChange: this.#handleModeChange,
     });
 
     filmCardPresenter.init({
@@ -90,18 +100,18 @@ export default class MainBoardPresenter {
     });
 
     if ( this.#filmCardPresenterList.has(filmCard.newId) ) {
-      const arr = this.#filmCardPresenterList.get(filmCard.newId);
-      arr.push(filmCardPresenter);
+      const sameCardPresentersArrToUpdate = this.#filmCardPresenterList.get(filmCard.newId);
+      sameCardPresentersArrToUpdate.push(filmCardPresenter);
       this.#filmCardPresenterList.set(
         filmCard.newId,
-        arr,
+        sameCardPresentersArrToUpdate,
       );
       return;
     }
 
-    const newArr = [];
-    newArr.push(filmCardPresenter);
-    this.#filmCardPresenterList.set(filmCard.newId, newArr);
+    const sameCardPresentersArr = [];
+    sameCardPresentersArr.push(filmCardPresenter);
+    this.#filmCardPresenterList.set(filmCard.newId, sameCardPresentersArr);
   }
 
   #renderFilmCards(from, to) {

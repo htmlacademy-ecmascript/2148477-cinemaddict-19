@@ -5,7 +5,7 @@ import PopupCommentHeaderView from '../view/popup-comment-header-view.js';
 import PopupCommentListView from '../view/popup-comment-list-view.js';
 import PopupCommentNewView from '../view/popup-comment-new-view.js';
 import PopupCommentView from '../view/popup-comment-view.js';
-import { render } from '../framework/render.js';
+import { render, replace, remove } from '../framework/render.js';
 
 export default class PopupPresenter {
   #popupComponent = new PopupView();
@@ -15,63 +15,113 @@ export default class PopupPresenter {
   #container = null;
   #filmCard = null;
   #commentsModel = null;
+  #handleWatchlistClick = null;
+  #handleAlreadyWatchedClick = null;
+  #handleFavoriteClick = null;
+  #handlePopupRemoval = null;
+  #mode = null;
+  #previousPopup = null;
+
   #popupFilmDetailsComponent = null;
   #popupCommentHeaderComponent = null;
   #popupCommentNewComponent = null;
 
   #comments = [];
 
-  constructor({container, filmCard, commentsModel}) {
+  constructor({container, commentsModel, onWatchlistClick, onAlreadyWatchedClick, onFavoriteClick}) {
     this.#container = container;
-    this.#filmCard = filmCard;
     this.#commentsModel = commentsModel;
+    this.#handleWatchlistClick = onWatchlistClick;
+    this.#handleAlreadyWatchedClick = onAlreadyWatchedClick;
+    this.#handleFavoriteClick = onFavoriteClick;
   }
 
-  init() {
+  init({filmCard, onPopupRemove, mode, previousPopup}) {
+    this.#filmCard = filmCard;
+    this.#handlePopupRemoval = onPopupRemove;
+    this.#mode = mode;
+    this.#previousPopup = previousPopup;
+
     this.#popupCommentHeaderComponent = new PopupCommentHeaderView({filmCard: this.#filmCard});
     this.#popupCommentNewComponent = new PopupCommentNewView();
 
-    const removePopup = () => {
-      this.#container.classList.remove('hide-overflow');
-      this.#container.removeEventListener('keydown', escKeyDownHandler);
+    this.#popupFilmDetailsComponent = new PopupFilmDetailsView({
+      filmCard: this.#filmCard,
+      onXClick: this.removePopup,
+      onWatchlistClick: this.#watchlistClickHandler,
+      onAlreadyWatchedClick: this.#alreadyWatchedClickHandler,
+      onFavoriteClick: this.#favoriteClickHandler,
+    });
 
-      this.#container.removeChild(this.#popupComponent.element);
+    // когда мы открываем попап во второй раз,
+    // элемент не будет null.
+    // надо привязываться к Mode
 
-      this.#popupComponent.removeElement();
-      this.#popupFilmDetailsComponent.removeElement();
-      this.#popupCommentContainerComponent.removeElement();
-      this.#popupCommentHeaderComponent.removeElement();
-      this.#popupCommentListComponent.removeElement();
-      this.#popupCommentNewComponent.removeElement();
-    };
+    if (this.#mode === 'DEFAULT') {
+      this.#container.classList.add('hide-overflow');
+      this.#container.addEventListener('keydown', this.#escKeyDownHandler);
 
-    function escKeyDownHandler (evt) {
-      if (evt.code === 'Escape') {
-        evt.preventDefault();
-        removePopup();
+      this.#comments = this.#commentsModel.comments.filter(
+        (comment) => this.#filmCard.comments.includes(+comment.id)
+      );
+
+      render(this.#popupComponent, this.#container);
+
+      render(this.#popupFilmDetailsComponent, this.#popupComponent.element.firstElementChild);
+
+      render(this.#popupCommentContainerComponent, this.#popupComponent.element.firstElementChild);
+      render(this.#popupCommentHeaderComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+
+      render(this.#popupCommentListComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+      for (const comment of this.#comments) {
+        render(new PopupCommentView({comment}), this.#popupCommentListComponent.element);
       }
+
+      render(this.#popupCommentNewComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+      return;
     }
 
-    this.#container.classList.add('hide-overflow');
-    this.#container.addEventListener('keydown', escKeyDownHandler);
-
-    this.#comments = this.#commentsModel.comments.filter(
-      (comment) => this.#filmCard.comments.includes(+comment.id)
-    );
-
-    render(this.#popupComponent, this.#container);
-
-    this.#popupFilmDetailsComponent = new PopupFilmDetailsView({filmCard: this.#filmCard, onClick: removePopup});
-    render(this.#popupFilmDetailsComponent, this.#popupComponent.element.firstElementChild);
-
-    render(this.#popupCommentContainerComponent, this.#popupComponent.element.firstElementChild);
-    render(this.#popupCommentHeaderComponent, this.#popupCommentContainerComponent.element.firstElementChild);
-
-    render(this.#popupCommentListComponent, this.#popupCommentContainerComponent.element.firstElementChild);
-    for (const comment of this.#comments) {
-      render(new PopupCommentView({comment}), this.#popupCommentListComponent.element);
+    if (this.#mode === 'POPUP') {
+      replace(this.#popupFilmDetailsComponent, this.#previousPopup.filmDetailsComponent);
     }
 
-    render(this.#popupCommentNewComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+    remove(this.#previousPopup.filmDetailsComponent);
   }
+
+  get filmDetailsComponent () {
+    return this.#popupFilmDetailsComponent;
+  }
+
+  removePopup = () => {
+    this.#container.classList.remove('hide-overflow');
+    this.#container.removeEventListener('keydown', this.#escKeyDownHandler);
+
+    remove(this.#popupCommentNewComponent);
+    remove(this.#popupCommentListComponent);
+    remove(this.#popupCommentHeaderComponent);
+    remove(this.#popupCommentContainerComponent);
+    remove(this.#popupFilmDetailsComponent);
+    remove(this.#popupComponent);
+
+    this.#handlePopupRemoval();
+  };
+
+  #escKeyDownHandler = (evt) => {
+    if (evt.code === 'Escape') {
+      evt.preventDefault();
+      this.removePopup();
+    }
+  };
+
+  #watchlistClickHandler = () => {
+    this.#handleWatchlistClick();
+  };
+
+  #alreadyWatchedClickHandler = () => {
+    this.#handleAlreadyWatchedClick();
+  };
+
+  #favoriteClickHandler = () => {
+    this.#handleFavoriteClick();
+  };
 }
