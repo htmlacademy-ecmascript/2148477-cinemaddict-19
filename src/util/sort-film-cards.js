@@ -33,7 +33,7 @@ function sortMainDate(filmCardA, filmCardB) {
 function sortMainRating(filmCardA, filmCardB) {
   const weight = getWeightForNullData(filmCardA.filmInfo.totalRating, filmCardB.filmInfo.totalRating);
 
-  return weight ?? filmCardA.filmInfo.totalRating - filmCardB.filmInfo.totalRating;
+  return weight ?? (filmCardB.filmInfo.totalRating - filmCardA.filmInfo.totalRating);
 }
 
 export {sortTopRated, sortMostCommented, sortMainDate, sortMainRating};
