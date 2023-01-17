@@ -1,25 +1,30 @@
 import UserProfileView from '../view/user-profile-view';
-import { render } from '../framework/render.js';
+import { remove, render } from '../framework/render.js';
 
 export default class HeaderPresenter {
   #container = null;
   #filmsModel = null;
 
-  #filmCards = [];
+  #userProfileComponent = null;
 
   #alreadyWatched = 0;
 
-  constructor({container, filmsModel}) {
-    this.#container = container;
-    this.#filmsModel = filmsModel;
+  constructor() {
+    this.#container = document.querySelector('.header');
   }
 
-  init() {
-    this.#filmCards = [...this.#filmsModel.films];
+  init({filmsModel}) {
+    this.#filmsModel = filmsModel;
 
-    this.#alreadyWatched = this.#filmCards.filter( (film) => film.userDetails.alreadyWatched).length;
+    if (this.#userProfileComponent !== null) {
+      remove(this.#userProfileComponent);
+    }
+
+    this.#alreadyWatched = [...this.#filmsModel.films].filter( (film) => film.userDetails.alreadyWatched).length;
+    this.#userProfileComponent = new UserProfileView({alreadyWatched: this.#alreadyWatched});
+
     if (this.#alreadyWatched > 0) {
-      render(new UserProfileView({alreadyWatched: this.#alreadyWatched}), this.#container);
+      render(this.#userProfileComponent, this.#container);
     }
   }
 }

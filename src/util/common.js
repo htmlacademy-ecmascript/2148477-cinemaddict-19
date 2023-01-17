@@ -3,7 +3,7 @@ function getRandomArrayElement(arr) {
 }
 
 function updateItem(items, update) {
-  return items.forEach((item) => {
+  items.forEach((item) => {
     if (item.newId === update.newId){
       item.userDetails = update.userDetails;
     }
