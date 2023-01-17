@@ -22,9 +22,26 @@ const FilterType = {
   FAVORITES: 'Favorites',
 };
 
+const SortType = {
+  DEFAULT: 'default',
+  DATE: 'date',
+  RATING: 'rating',
+};
+
 const Mode = {
   DEFAULT: 'DEFAULT',
   POPUP: 'POPUP',
 };
 
-export {POSTERS, EMOTIONS, FilterType, Mode};
+const FILM_EXTRA_HEADER = {
+  topRated: 'Top Rated',
+  mostCommented: 'Most Commented',
+};
+
+const FILM_EXTRA_CARD_COUNT = {
+  topRated: 2,
+  mostCommented: 2,
+};
+
+
+export {POSTERS, EMOTIONS, FilterType, SortType, Mode, FILM_EXTRA_HEADER, FILM_EXTRA_CARD_COUNT};

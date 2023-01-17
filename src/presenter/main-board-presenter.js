@@ -8,9 +8,12 @@ import ShowMoreButtonView from '../view/show-more-button-view.js';
 
 import FilterBarPresenter from './filters-presenter.js';
 import FilmCardPresenter from './film-card-presenter.js';
+import FilmExtraPresenter from './film-extra-presenter.js';
 
 import { remove, render, RenderPosition } from '../framework/render.js';
 import { updateItem } from '../util/common.js';
+import { sortMainDate, sortMainRating, sortTopRated, sortMostCommented } from '../util/sort-film-cards.js';
+import { SortType, FILM_EXTRA_CARD_COUNT, FILM_EXTRA_HEADER } from '../util/const.js';
 
 const FILM_CARDS_COUNT_PER_STEP = 5;
 
@@ -23,10 +26,12 @@ export default class MainBoardPresenter {
   #filmHeaderComponent = new FilmListHeaderView();
   #filmContainerComponent = new FilmContainerView();
   #showMoreButtonComponent = null;
-  #sortBarComponent = new SortBarView();
+  #sortBarComponent = null;
   #noFilmCardsComponent = new NoFilmCardsView();
 
   #filterBarPresenter = null;
+  #topRatedPresenter = null;
+  #mostCommentedPresenter = null;
 
   #container = null;
   #filmsModel = null;
@@ -35,12 +40,32 @@ export default class MainBoardPresenter {
   #filmCards = [];
   #renderedFilmCardsCount = FILM_CARDS_COUNT_PER_STEP;
   #filmCardPresenterList = null;
+  #currentSortType = SortType.DEFAULT;
+  #defaultFilmCards = [];
 
   constructor({container, filmsModel, commentsModel, filmCardPresenterList}) {
     this.#container = container;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
     this.#filmCardPresenterList = filmCardPresenterList;
+    this.#topRatedPresenter = new FilmExtraPresenter({
+      mainBoardPresenter: this,
+      filmsModel: this.#filmsModel,
+      commentsModel: this.#commentsModel,
+      filmExtraCardCount: FILM_EXTRA_CARD_COUNT.topRated,
+      filmExtraHeader: FILM_EXTRA_HEADER.topRated,
+      filmExtraSortCB: sortTopRated,
+      filmCardPresenterList: this.#filmCardPresenterList,
+    });
+    this.#mostCommentedPresenter = new FilmExtraPresenter({
+      mainBoardPresenter: this,
+      filmsModel: this.#filmsModel,
+      commentsModel: this.#commentsModel,
+      filmExtraCardCount: FILM_EXTRA_CARD_COUNT.mostCommented,
+      filmExtraHeader: FILM_EXTRA_HEADER.mostCommented,
+      filmExtraSortCB: sortMostCommented,
+      filmCardPresenterList: this.#filmCardPresenterList,
+    });
   }
 
   get filmWrapperComponent() {
@@ -49,8 +74,10 @@ export default class MainBoardPresenter {
 
   init() {
     this.#filmCards = [...this.#filmsModel.films];
+    this.#defaultFilmCards = [...this.#filmsModel.films];
 
     this.#renderMainBoard();
+    this.#renderExtra();
   }
 
   #handleShowMoreButtonClick = () => {
@@ -67,6 +94,7 @@ export default class MainBoardPresenter {
 
   handleFilmCardChange = (updatedFilmCard) => {
     updateItem(this.#filmCards, updatedFilmCard);
+    updateItem(this.#defaultFilmCards, updatedFilmCard);
     this.#filmCardPresenterList.get(updatedFilmCard.newId).forEach(
       (presenter) => presenter.init({
         popupContainer: this.#page,
@@ -85,7 +113,44 @@ export default class MainBoardPresenter {
     );
   };
 
+  #sortFilmCards(sortType) {
+    switch (sortType) {
+      case SortType.DATE:
+        this.#filmCards.sort(sortMainDate);
+        break;
+      case SortType.RATING:
+        this.#filmCards.sort(sortMainRating);
+        break;
+      default:
+        this.#filmCards = [...this.#defaultFilmCards];
+    }
+
+    this.#currentSortType = sortType;
+  }
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortFilmCards(sortType);
+    this.#clearFilmList();
+    this.#renderFilmList();
+    this.#renderSortBar();
+    this.#renderFilterBar();
+    this.#renderExtra();
+  };
+
   #renderSortBar() {
+    if (this.#sortBarComponent !== null) {
+      remove(this.#sortBarComponent);
+    }
+
+    this.#sortBarComponent = new SortBarView({
+      onSortTypeChange: this.#handleSortTypeChange,
+      currentSortType: this.#currentSortType,
+    });
+
     render(this.#sortBarComponent, this.#container, RenderPosition.AFTERBEGIN);
   }
 
@@ -156,7 +221,12 @@ export default class MainBoardPresenter {
   }
 
   #clearFilmList() {
-    this.#filmCardPresenterList.forEach((presenter) => presenter.destroy());
+    this.#filmCardPresenterList.forEach(
+      (presentersArr) => presentersArr.forEach(
+        (presenter) => presenter.destroy()
+      )
+    );
+
     this.#filmCardPresenterList.clear();
     this.#renderedFilmCardsCount = FILM_CARDS_COUNT_PER_STEP;
     remove(this.#showMoreButtonComponent);
@@ -174,5 +244,10 @@ export default class MainBoardPresenter {
     this.#renderSortBar();
     this.#renderFilterBar();
     this.#renderFilmList();
+  }
+
+  #renderExtra() {
+    this.#topRatedPresenter.init();
+    this.#mostCommentedPresenter.init();
   }
 }
