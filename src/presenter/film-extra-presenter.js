@@ -5,7 +5,7 @@ import FilmContainerView from '../view/film-container-view.js';
 import FilmCardPresenter from './film-card-presenter.js';
 
 import { render } from '../framework/render.js';
-import { updateItem } from '../util/common.js';
+// import { updateItem } from '../util/common.js';
 
 export default class FilmExtraPresenter {
   #page = document.querySelector('.page');
@@ -13,6 +13,8 @@ export default class FilmExtraPresenter {
   #filmExtraListComponent = new FilmListView();
   #filmExtraHeaderComponent = new FilmListHeaderView();
   #filmExtraContainerComponent = new FilmContainerView();
+
+  #mainBoardPresenter = null;
 
   #container = null;
   #filmsModel = null;
@@ -27,8 +29,11 @@ export default class FilmExtraPresenter {
 
   #filmCardPresenterList = null;
 
-  constructor({container, filmsModel, commentsModel, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList}) {
-    this.#container = container;
+  #handleFilmCardChange = null;
+
+  constructor({mainBoardPresenter, filmsModel, commentsModel, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList}) {
+    this.#mainBoardPresenter = mainBoardPresenter;
+    this.#container = mainBoardPresenter.filmWrapperComponent;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
     this.#filmExtraCardCount = filmExtraCardCount;
@@ -39,20 +44,21 @@ export default class FilmExtraPresenter {
 
   init() {
     this.#filmCards = [...this.#filmsModel.films];
+    this.#handleFilmCardChange = this.#mainBoardPresenter.handleFilmCardChange;
 
     this.#renderFilmExtra();
   }
 
-  #handleFilmCardChange = (updatedFilmCard) => {
-    updateItem(this.#filmCards, updatedFilmCard);
-    this.#filmCardPresenterList.get(updatedFilmCard.newId).forEach(
-      (presenter) => presenter.init({
-        popupContainer: this.#page,
-        filmCard: updatedFilmCard,
-        commentsModel: this.#commentsModel
-      })
-    );
-  };
+  // #handleFilmCardChange = (updatedFilmCard) => {
+  //   updateItem(this.#filmCards, updatedFilmCard);
+  //   this.#filmCardPresenterList.get(updatedFilmCard.newId).forEach(
+  //     (presenter) => presenter.init({
+  //       popupContainer: this.#page,
+  //       filmCard: updatedFilmCard,
+  //       commentsModel: this.#commentsModel
+  //     })
+  //   );
+  // };
 
   #handleModeChange = () => {
     this.#filmCardPresenterList.forEach(

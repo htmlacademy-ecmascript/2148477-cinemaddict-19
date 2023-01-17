@@ -38,7 +38,7 @@ const mainBoardPresenter = new MainBoardPresenter({
   filmCardPresenterList,
 });
 const topRatedPresenter = new FilmExtraPresenter({
-  container: mainBoardPresenter.filmWrapperComponent,
+  mainBoardPresenter,
   filmsModel,
   commentsModel,
   filmExtraCardCount: FILM_EXTRA_CARD_COUNT.topRated,
@@ -47,7 +47,7 @@ const topRatedPresenter = new FilmExtraPresenter({
   filmCardPresenterList,
 });
 const mostCommentedPresenter = new FilmExtraPresenter({
-  container: mainBoardPresenter.filmWrapperComponent,
+  mainBoardPresenter,
   filmsModel,
   commentsModel,
   filmExtraCardCount: FILM_EXTRA_CARD_COUNT.mostCommented,

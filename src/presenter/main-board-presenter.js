@@ -65,7 +65,7 @@ export default class MainBoardPresenter {
     }
   };
 
-  #handleFilmCardChange = (updatedFilmCard) => {
+  handleFilmCardChange = (updatedFilmCard) => {
     updateItem(this.#filmCards, updatedFilmCard);
     this.#filmCardPresenterList.get(updatedFilmCard.newId).forEach(
       (presenter) => presenter.init({
@@ -103,7 +103,7 @@ export default class MainBoardPresenter {
 
   #renderFilmCard(filmCard, commentsModel) {
     const filmCardPresenter = new FilmCardPresenter({
-      onFilmCardChange: this.#handleFilmCardChange,
+      onFilmCardChange: this.handleFilmCardChange,
       filmCardContainer: this.#filmContainerComponent.element,
       onModeChange: this.#handleModeChange,
     });
