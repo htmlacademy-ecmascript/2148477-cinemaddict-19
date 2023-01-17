@@ -9,6 +9,7 @@ import ShowMoreButtonView from '../view/show-more-button-view.js';
 import FilterBarPresenter from './filters-presenter.js';
 import FilmCardPresenter from './film-card-presenter.js';
 import FilmExtraPresenter from './film-extra-presenter.js';
+import HeaderPresenter from './header-presenter.js';
 
 import { remove, render, RenderPosition } from '../framework/render.js';
 import { updateItem } from '../util/common.js';
@@ -32,6 +33,7 @@ export default class MainBoardPresenter {
   #filterBarPresenter = null;
   #topRatedPresenter = null;
   #mostCommentedPresenter = null;
+  #headerPresenter = null;
 
   #container = null;
   #filmsModel = null;
@@ -39,15 +41,14 @@ export default class MainBoardPresenter {
 
   #filmCards = [];
   #renderedFilmCardsCount = FILM_CARDS_COUNT_PER_STEP;
-  #filmCardPresenterList = null;
+  #filmCardPresenterList = new Map();
   #currentSortType = SortType.DEFAULT;
   #defaultFilmCards = [];
 
-  constructor({container, filmsModel, commentsModel, filmCardPresenterList}) {
+  constructor({container, filmsModel, commentsModel}) {
     this.#container = container;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
-    this.#filmCardPresenterList = filmCardPresenterList;
     this.#topRatedPresenter = new FilmExtraPresenter({
       mainBoardPresenter: this,
       filmsModel: this.#filmsModel,
@@ -66,6 +67,7 @@ export default class MainBoardPresenter {
       filmExtraSortCB: sortMostCommented,
       filmCardPresenterList: this.#filmCardPresenterList,
     });
+    this.#headerPresenter = new HeaderPresenter();
   }
 
   get filmWrapperComponent() {
@@ -78,6 +80,7 @@ export default class MainBoardPresenter {
 
     this.#renderMainBoard();
     this.#renderExtra();
+    this.#renderHeader();
   }
 
   #handleShowMoreButtonClick = () => {
@@ -103,6 +106,7 @@ export default class MainBoardPresenter {
       })
     );
     this.#renderFilterBar();
+    this.#renderHeader();
   };
 
   #handleModeChange = () => {
@@ -249,5 +253,9 @@ export default class MainBoardPresenter {
   #renderExtra() {
     this.#topRatedPresenter.init();
     this.#mostCommentedPresenter.init();
+  }
+
+  #renderHeader() {
+    this.#headerPresenter.init({filmsModel: this.#filmsModel});
   }
 }
