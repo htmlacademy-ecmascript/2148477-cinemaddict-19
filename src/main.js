@@ -1,7 +1,6 @@
 import { sortTopRated, sortMostCommented } from './util/sort-film-extra.js';
 
 import HeaderPresenter from './presenter/header-presenter.js';
-import FilterBarPresenter from './presenter/filters-presenter.js';
 import MainBoardPresenter from './presenter/main-board-presenter.js';
 import FilmExtraPresenter from './presenter/film-extra-presenter.js';
 import FilmsModel from './model/films-model.js';
@@ -30,10 +29,6 @@ const commentsModel = new CommentsModel();
 
 const headerPresenter = new HeaderPresenter({
   container: pageHeader,
-  filmsModel,
-});
-const filterBarPresenter = new FilterBarPresenter({
-  container: pageMain,
   filmsModel,
 });
 const mainBoardPresenter = new MainBoardPresenter({
@@ -66,7 +61,6 @@ const footerStatisticPresenter = new FooterStatisticPresenter({
 });
 
 headerPresenter.init();
-filterBarPresenter.init();
 mainBoardPresenter.init();
 topRatedPresenter.init();
 mostCommentedPresenter.init();

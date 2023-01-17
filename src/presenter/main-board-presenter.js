@@ -6,6 +6,7 @@ import FilmListHeaderView from '../view/film-list-header-view.js';
 import FilmContainerView from '../view/film-container-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 
+import FilterBarPresenter from './filters-presenter.js';
 import FilmCardPresenter from './film-card-presenter.js';
 
 import { remove, render, RenderPosition } from '../framework/render.js';
@@ -25,6 +26,7 @@ export default class MainBoardPresenter {
   #sortBarComponent = new SortBarView();
   #noFilmCardsComponent = new NoFilmCardsView();
 
+  #filterBarPresenter = null;
 
   #container = null;
   #filmsModel = null;
@@ -72,6 +74,7 @@ export default class MainBoardPresenter {
         commentsModel: this.#commentsModel
       })
     );
+    this.#renderFilterBar();
   };
 
   #handleModeChange = () => {
@@ -84,6 +87,18 @@ export default class MainBoardPresenter {
 
   #renderSortBar() {
     render(this.#sortBarComponent, this.#container, RenderPosition.AFTERBEGIN);
+  }
+
+  #renderFilterBar() {
+    const prevFilterBarPresenter = this.#filterBarPresenter;
+
+    this.#filterBarPresenter = new FilterBarPresenter({container: this.#container});
+
+    if (prevFilterBarPresenter !== null) {
+      prevFilterBarPresenter.removeFilterBar();
+    }
+
+    this.#filterBarPresenter.init({filmsModel: this.#filmsModel});
   }
 
   #renderFilmCard(filmCard, commentsModel) {
@@ -157,6 +172,7 @@ export default class MainBoardPresenter {
     }
 
     this.#renderSortBar();
+    this.#renderFilterBar();
     this.#renderFilmList();
   }
 }
