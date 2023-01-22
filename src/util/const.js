@@ -8,12 +8,12 @@ const POSTERS = [
   '"images/posters/the-man-with-the-golden-arm.jpg"'
 ];
 
-const EMOTIONS = [
-  'smile',
-  'sleeping',
-  'puke',
-  'angry'
-];
+const EMOTIONS = {
+  smile: 'smile',
+  sleeping: 'sleeping',
+  puke: 'puke',
+  angry: 'angry',
+};
 
 const FilterType = {
   ALL: 'All',

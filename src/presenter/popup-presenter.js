@@ -28,21 +28,28 @@ export default class PopupPresenter {
 
   #comments = [];
 
-  constructor({container, commentsModel, onWatchlistClick, onAlreadyWatchedClick, onFavoriteClick}) {
+  #state = {};
+  #scrollTop = null;
+
+  constructor({container, onWatchlistClick, onAlreadyWatchedClick, onFavoriteClick}) {
     this.#container = container;
-    this.#commentsModel = commentsModel;
     this.#handleWatchlistClick = onWatchlistClick;
     this.#handleAlreadyWatchedClick = onAlreadyWatchedClick;
     this.#handleFavoriteClick = onFavoriteClick;
   }
 
-  init({filmCard, onPopupRemove, mode}) {
+  init({filmCard, commentsModel, onPopupRemove, mode}) {
     this.#filmCard = filmCard;
+    this.#commentsModel = commentsModel;
     this.#handlePopupRemoval = onPopupRemove;
     this.#mode = mode;
 
+    if (this.#mode === Mode.DEFAULT) {
+      this.#resetState();
+    }
+
     this.#popupCommentHeaderComponent = new PopupCommentHeaderView({filmCard: this.#filmCard});
-    this.#popupCommentNewComponent = new PopupCommentNewView();
+    this.#popupCommentNewComponent = new PopupCommentNewView({comment: this.#state, onStateCange: this.#onStateChange});
 
     this.#popupFilmDetailsComponent = new PopupFilmDetailsView({
       filmCard: this.#filmCard,
@@ -52,29 +59,61 @@ export default class PopupPresenter {
       onFavoriteClick: this.#favoriteClickHandler,
     });
 
-    if (this.#mode === Mode.DEFAULT) {
-      this.#container.classList.add('hide-overflow');
-      this.#container.addEventListener('keydown', this.#escKeyDownHandler);
+    // render popup block
 
-      this.#comments = this.#commentsModel.comments.filter(
-        (comment) => this.#filmCard.comments.includes(+comment.id)
-      );
+    this.#container.classList.add('hide-overflow');
+    this.#container.addEventListener('keydown', this.#escKeyDownHandler);
 
-      render(this.#popupComponent, this.#container);
+    this.#comments = this.#commentsModel.comments.filter(
+      (comment) => this.#filmCard.comments.includes(+comment.id)
+    );
 
-      render(this.#popupFilmDetailsComponent, this.#popupComponent.element.firstElementChild);
+    render(this.#popupComponent, this.#container);
 
-      render(this.#popupCommentContainerComponent, this.#popupComponent.element.firstElementChild);
-      render(this.#popupCommentHeaderComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+    render(this.#popupFilmDetailsComponent, this.#popupComponent.element.firstElementChild);
 
-      render(this.#popupCommentListComponent, this.#popupCommentContainerComponent.element.firstElementChild);
-      for (const comment of this.#comments) {
-        render(new PopupCommentView({comment}), this.#popupCommentListComponent.element);
-      }
+    render(this.#popupCommentContainerComponent, this.#popupComponent.element.firstElementChild);
+    render(this.#popupCommentHeaderComponent, this.#popupCommentContainerComponent.element.firstElementChild);
 
-      render(this.#popupCommentNewComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+    render(this.#popupCommentListComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+    for (const comment of this.#comments) {
+      render(new PopupCommentView({comment}), this.#popupCommentListComponent.element);
+    }
+
+    render(this.#popupCommentNewComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+
+    // render popup block
+
+    if (this.#mode === Mode.POPUP) {
+      this.#popupComponent.element.scrollTop = this.#scrollTop;
     }
   }
+
+  // popup state block
+
+  #onStateChange = (newState) => {
+    this.#state = newState;
+  };
+
+  #resetState = () => {
+    this.#state = {
+      id: '',
+      author: '',
+      comment: '',
+      date: null,
+      emotion: '',
+    };
+  };
+
+  get popupScroll() {
+    return this.#scrollTop;
+  }
+
+  set popupScroll(value) {
+    this.#scrollTop = value;
+  }
+
+  // popup state block
 
   removePopup = () => {
     this.#container.classList.remove('hide-overflow');
@@ -98,14 +137,17 @@ export default class PopupPresenter {
   };
 
   #watchlistClickHandler = () => {
+    this.popupScroll = this.#popupComponent.element.scrollTop;
     this.#handleWatchlistClick();
   };
 
   #alreadyWatchedClickHandler = () => {
+    this.popupScroll = this.#popupComponent.element.scrollTop;
     this.#handleAlreadyWatchedClick();
   };
 
   #favoriteClickHandler = () => {
+    this.popupScroll = this.#popupComponent.element.scrollTop;
     this.#handleFavoriteClick();
   };
 }
