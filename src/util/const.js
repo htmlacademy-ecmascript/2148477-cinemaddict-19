@@ -8,11 +8,11 @@ const POSTERS = [
   '"images/posters/the-man-with-the-golden-arm.jpg"'
 ];
 
-const EMOTIONS = {
-  smile: 'smile',
-  sleeping: 'sleeping',
-  puke: 'puke',
-  angry: 'angry',
+const Emotion = {
+  SMILE: 'smile',
+  SLEEPING: 'sleeping',
+  PUKE: 'puke',
+  ANGRY: 'angry',
 };
 
 const FilterType = {
@@ -44,4 +44,4 @@ const FILM_EXTRA_CARD_COUNT = {
 };
 
 
-export {POSTERS, EMOTIONS, FilterType, SortType, Mode, FILM_EXTRA_HEADER, FILM_EXTRA_CARD_COUNT};
+export {POSTERS, Emotion, FilterType, SortType, Mode, FILM_EXTRA_HEADER, FILM_EXTRA_CARD_COUNT};

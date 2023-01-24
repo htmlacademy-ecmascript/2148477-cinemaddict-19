@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { EMOTIONS } from '../util/const.js';
+import { Emotion } from '../util/const.js';
 
 const NEW_COMMENT = {
   id: '',
@@ -21,22 +21,22 @@ function createPopupCommentNewTemplate(comment) {
       </label>
 
       <div class="film-details__emoji-list">
-        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile"${comment.emotion === EMOTIONS.smile ? ' checked' : ''}>
+        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile"${comment.emotion === Emotion.SMILE ? ' checked' : ''}>
         <label class="film-details__emoji-label" for="emoji-smile">
           <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji" data-emoji ="smile">
         </label>
 
-        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping"${comment.emotion === EMOTIONS.sleeping ? ' checked' : ''}>
+        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping"${comment.emotion === Emotion.SLEEPING ? ' checked' : ''}>
         <label class="film-details__emoji-label" for="emoji-sleeping">
           <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji" data-emoji ="sleeping">
         </label>
 
-        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke"${comment.emotion === EMOTIONS.puke ? ' checked' : ''}>
+        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke"${comment.emotion === Emotion.PUKE ? ' checked' : ''}>
         <label class="film-details__emoji-label" for="emoji-puke">
           <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji" data-emoji ="puke">
         </label>
 
-        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry"${comment.emotion === EMOTIONS.angry ? ' checked' : ''}>
+        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry"${comment.emotion === Emotion.ANGRY ? ' checked' : ''}>
         <label class="film-details__emoji-label" for="emoji-angry">
           <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji" data-emoji ="angry">
         </label>
