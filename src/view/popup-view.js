@@ -14,7 +14,7 @@ function createPopupViewTemplate() {
 export default class PopupView extends AbstractStatefulView {
   constructor() {
     super();
-    this._setState(PopupView.parseScrollToState(NULL_SCROLL));
+    this._setState({...NULL_SCROLL});
 
     this._restoreHandlers();
   }
@@ -24,9 +24,7 @@ export default class PopupView extends AbstractStatefulView {
   }
 
   reset() {
-    this.updateElement(
-      PopupView.parseScrollToState(NULL_SCROLL),
-    );
+    this.updateElement({...NULL_SCROLL});
   }
 
   _restoreHandlers() {
@@ -34,7 +32,7 @@ export default class PopupView extends AbstractStatefulView {
   }
 
   restoreScroll() {
-    this.element.scrollTop = PopupView.parseStateToScroll(this._state).scroll;
+    this.element.scrollTop = this._state.scroll;
   }
 
   #scrollChangeHandler = (evt) => {
@@ -43,14 +41,4 @@ export default class PopupView extends AbstractStatefulView {
       scroll: this.element.scrollTop,
     });
   };
-
-  static parseScrollToState(scroll) {
-    return {...scroll};
-  }
-
-  static parseStateToScroll(state) {
-    const scroll = {...state};
-
-    return scroll;
-  }
 }
