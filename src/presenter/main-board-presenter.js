@@ -188,7 +188,7 @@ export default class MainBoardPresenter {
       updatedSameCardPresenters.push(filmCardPresenter);
       this.#filmCardPresenterList.set(
         filmCard.newId,
-        updatedSameCardPresenters,
+        updatedSameCardPresenters
       );
       return;
     }

@@ -29,15 +29,15 @@ export default class FilmCardPresenter {
     this.#commentsModel = commentsModel;
 
     const prevFilmCardComponent = this.#filmCardComponent;
-    const prevPopupPresenter = this.#popupPresenter;
 
-    this.#popupPresenter = new PopupPresenter({
-      container: this.#popupContainer,
-      commentsModel: this.#commentsModel,
-      onWatchlistClick: this.#handleWatchlistClick,
-      onAlreadyWatchedClick: this.#handleAlreadyWatchedClick,
-      onFavoriteClick: this.#handleFavoriteClick,
-    });
+    if (!this.#popupPresenter) {
+      this.#popupPresenter = new PopupPresenter({
+        container: this.#popupContainer,
+        onWatchlistClick: this.#handleWatchlistClick,
+        onAlreadyWatchedClick: this.#handleAlreadyWatchedClick,
+        onFavoriteClick: this.#handleFavoriteClick,
+      });
+    }
 
     this.#filmCardComponent = new FilmCardView({
       filmCard: this.#filmCard,
@@ -58,13 +58,13 @@ export default class FilmCardPresenter {
 
     if (this.#mode === Mode.POPUP) {
       replace(this.#filmCardComponent, prevFilmCardComponent);
-      prevPopupPresenter.removePopup();
+      this.#popupPresenter.earsePopup();
       this.#popupPresenter.init({
         filmCard: this.#filmCard,
+        commentsModel: this.#commentsModel,
         onPopupRemove: this.#resetMode,
         mode: this.#mode,
       });
-      this.#mode = Mode.POPUP;
     }
 
     remove(prevFilmCardComponent);
@@ -99,7 +99,11 @@ export default class FilmCardPresenter {
 
   #handleFilmCardClick = () => {
     this.#handleModeChange();
-    this.#popupPresenter.init({filmCard: this.#filmCard, onPopupRemove: this.#resetMode, mode: this.#mode});
+    this.#popupPresenter.init({
+      filmCard: this.#filmCard,
+      commentsModel: this.#commentsModel,
+      onPopupRemove: this.#resetMode,
+      mode: this.#mode});
     this.#mode = Mode.POPUP;
   };
 }

@@ -12,6 +12,8 @@ export default class PopupPresenter {
   #popupComponent = new PopupView();
   #popupCommentContainerComponent = new PopupCommentContainerView();
   #popupCommentListComponent = new PopupCommentListView();
+  #popupCommentNewComponent = new PopupCommentNewView({onFormSubmit: null});
+
 
   #container = null;
   #filmCard = null;
@@ -24,25 +26,24 @@ export default class PopupPresenter {
 
   #popupFilmDetailsComponent = null;
   #popupCommentHeaderComponent = null;
-  #popupCommentNewComponent = null;
 
   #comments = [];
+  #commentViews = [];
 
-  constructor({container, commentsModel, onWatchlistClick, onAlreadyWatchedClick, onFavoriteClick}) {
+  constructor({container, onWatchlistClick, onAlreadyWatchedClick, onFavoriteClick}) {
     this.#container = container;
-    this.#commentsModel = commentsModel;
     this.#handleWatchlistClick = onWatchlistClick;
     this.#handleAlreadyWatchedClick = onAlreadyWatchedClick;
     this.#handleFavoriteClick = onFavoriteClick;
   }
 
-  init({filmCard, onPopupRemove, mode}) {
+  init({filmCard, commentsModel, onPopupRemove, mode}) {
     this.#filmCard = filmCard;
+    this.#commentsModel = commentsModel;
     this.#handlePopupRemoval = onPopupRemove;
     this.#mode = mode;
 
     this.#popupCommentHeaderComponent = new PopupCommentHeaderView({filmCard: this.#filmCard});
-    this.#popupCommentNewComponent = new PopupCommentNewView();
 
     this.#popupFilmDetailsComponent = new PopupFilmDetailsView({
       filmCard: this.#filmCard,
@@ -52,40 +53,62 @@ export default class PopupPresenter {
       onFavoriteClick: this.#favoriteClickHandler,
     });
 
-    if (this.#mode === Mode.DEFAULT) {
-      this.#container.classList.add('hide-overflow');
-      this.#container.addEventListener('keydown', this.#escKeyDownHandler);
+    // render popup block
 
-      this.#comments = this.#commentsModel.comments.filter(
-        (comment) => this.#filmCard.comments.includes(+comment.id)
-      );
+    this.#container.classList.add('hide-overflow');
+    this.#container.addEventListener('keydown', this.#escKeyDownHandler);
 
-      render(this.#popupComponent, this.#container);
+    this.#comments = this.#commentsModel.comments.filter(
+      (comment) => this.#filmCard.comments.includes(+comment.id)
+    );
 
-      render(this.#popupFilmDetailsComponent, this.#popupComponent.element.firstElementChild);
+    render(this.#popupComponent, this.#container);
 
-      render(this.#popupCommentContainerComponent, this.#popupComponent.element.firstElementChild);
-      render(this.#popupCommentHeaderComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+    render(this.#popupFilmDetailsComponent, this.#popupComponent.element.firstElementChild);
 
-      render(this.#popupCommentListComponent, this.#popupCommentContainerComponent.element.firstElementChild);
-      for (const comment of this.#comments) {
-        render(new PopupCommentView({comment}), this.#popupCommentListComponent.element);
-      }
+    render(this.#popupCommentContainerComponent, this.#popupComponent.element.firstElementChild);
+    render(this.#popupCommentHeaderComponent, this.#popupCommentContainerComponent.element.firstElementChild);
 
-      render(this.#popupCommentNewComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+    render(this.#popupCommentListComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+    for (const comment of this.#comments) {
+      const commentView = new PopupCommentView({comment});
+      render(commentView, this.#popupCommentListComponent.element);
+      this.#commentViews.push(commentView);
+    }
+
+    render(this.#popupCommentNewComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+
+    // render popup block
+
+    if (this.#mode === Mode.POPUP) {
+      this.#popupComponent.restoreScroll();
     }
   }
+
+  earsePopup = () => {
+    remove(this.#popupFilmDetailsComponent);
+    remove(this.#popupCommentHeaderComponent);
+    this.#commentViews.forEach((commentView) => remove(commentView));
+
+    this.#popupComponent.element.remove();
+  };
 
   removePopup = () => {
     this.#container.classList.remove('hide-overflow');
     this.#container.removeEventListener('keydown', this.#escKeyDownHandler);
 
-    remove(this.#popupCommentNewComponent);
-    remove(this.#popupCommentListComponent);
-    remove(this.#popupCommentHeaderComponent);
-    remove(this.#popupCommentContainerComponent);
-    remove(this.#popupFilmDetailsComponent);
     remove(this.#popupComponent);
+    this.#popupComponent.reset();
+
+    remove(this.#popupCommentContainerComponent);
+    remove(this.#popupCommentHeaderComponent);
+    remove(this.#popupCommentListComponent);
+    this.#commentViews.forEach((commentView) => remove(commentView));
+
+    remove(this.#popupCommentNewComponent);
+    this.#popupCommentNewComponent.reset();
+
+    remove(this.#popupFilmDetailsComponent);
 
     this.#handlePopupRemoval();
   };
