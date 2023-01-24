@@ -12,6 +12,8 @@ export default class PopupPresenter {
   #popupComponent = new PopupView();
   #popupCommentContainerComponent = new PopupCommentContainerView();
   #popupCommentListComponent = new PopupCommentListView();
+  #popupCommentNewComponent = new PopupCommentNewView({onFormSubmit: null});
+
 
   #container = null;
   #filmCard = null;
@@ -24,12 +26,9 @@ export default class PopupPresenter {
 
   #popupFilmDetailsComponent = null;
   #popupCommentHeaderComponent = null;
-  #popupCommentNewComponent = null;
 
   #comments = [];
-
-  #state = {};
-  #scrollTop = null;
+  #commentViews = [];
 
   constructor({container, onWatchlistClick, onAlreadyWatchedClick, onFavoriteClick}) {
     this.#container = container;
@@ -44,12 +43,7 @@ export default class PopupPresenter {
     this.#handlePopupRemoval = onPopupRemove;
     this.#mode = mode;
 
-    if (this.#mode === Mode.DEFAULT) {
-      this.#resetState();
-    }
-
     this.#popupCommentHeaderComponent = new PopupCommentHeaderView({filmCard: this.#filmCard});
-    this.#popupCommentNewComponent = new PopupCommentNewView({comment: this.#state, onStateCange: this.#onStateChange});
 
     this.#popupFilmDetailsComponent = new PopupFilmDetailsView({
       filmCard: this.#filmCard,
@@ -77,7 +71,9 @@ export default class PopupPresenter {
 
     render(this.#popupCommentListComponent, this.#popupCommentContainerComponent.element.firstElementChild);
     for (const comment of this.#comments) {
-      render(new PopupCommentView({comment}), this.#popupCommentListComponent.element);
+      const commentView = new PopupCommentView({comment});
+      render(commentView, this.#popupCommentListComponent.element);
+      this.#commentViews.push(commentView);
     }
 
     render(this.#popupCommentNewComponent, this.#popupCommentContainerComponent.element.firstElementChild);
@@ -85,46 +81,34 @@ export default class PopupPresenter {
     // render popup block
 
     if (this.#mode === Mode.POPUP) {
-      this.#popupComponent.element.scrollTop = this.#scrollTop;
+      this.#popupComponent.restoreScroll();
     }
   }
 
-  // popup state block
+  earsePopup = () => {
+    remove(this.#popupFilmDetailsComponent);
+    remove(this.#popupCommentHeaderComponent);
+    this.#commentViews.forEach((commentView) => remove(commentView));
 
-  #onStateChange = (newState) => {
-    this.#state = newState;
+    this.#popupComponent.element.remove();
   };
-
-  #resetState = () => {
-    this.#state = {
-      id: '',
-      author: '',
-      comment: '',
-      date: null,
-      emotion: '',
-    };
-  };
-
-  get popupScroll() {
-    return this.#scrollTop;
-  }
-
-  set popupScroll(value) {
-    this.#scrollTop = value;
-  }
-
-  // popup state block
 
   removePopup = () => {
     this.#container.classList.remove('hide-overflow');
     this.#container.removeEventListener('keydown', this.#escKeyDownHandler);
 
-    remove(this.#popupCommentNewComponent);
-    remove(this.#popupCommentListComponent);
-    remove(this.#popupCommentHeaderComponent);
-    remove(this.#popupCommentContainerComponent);
-    remove(this.#popupFilmDetailsComponent);
     remove(this.#popupComponent);
+    this.#popupComponent.reset();
+
+    remove(this.#popupCommentContainerComponent);
+    remove(this.#popupCommentHeaderComponent);
+    remove(this.#popupCommentListComponent);
+    this.#commentViews.forEach((commentView) => remove(commentView));
+
+    remove(this.#popupCommentNewComponent);
+    this.#popupCommentNewComponent.reset();
+
+    remove(this.#popupFilmDetailsComponent);
 
     this.#handlePopupRemoval();
   };
@@ -137,17 +121,14 @@ export default class PopupPresenter {
   };
 
   #watchlistClickHandler = () => {
-    this.popupScroll = this.#popupComponent.element.scrollTop;
     this.#handleWatchlistClick();
   };
 
   #alreadyWatchedClickHandler = () => {
-    this.popupScroll = this.#popupComponent.element.scrollTop;
     this.#handleAlreadyWatchedClick();
   };
 
   #favoriteClickHandler = () => {
-    this.popupScroll = this.#popupComponent.element.scrollTop;
     this.#handleFavoriteClick();
   };
 }

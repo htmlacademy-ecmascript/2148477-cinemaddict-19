@@ -47,14 +47,12 @@ function createPopupCommentNewTemplate(comment) {
 
 export default class PopupCommentNewView extends AbstractStatefulView {
   #handleFormSubmit = null;
-  #handleStateChange = null;
 
 
-  constructor({comment = NEW_COMMENT, onFormSubmit, onStateCange}) {
+  constructor({comment = NEW_COMMENT, onFormSubmit}) {
     super();
     this._setState(PopupCommentNewView.parseCommentToState(comment));
     this.#handleFormSubmit = onFormSubmit;
-    this.#handleStateChange = onStateCange;
 
     this._restoreHandlers();
   }
@@ -80,7 +78,6 @@ export default class PopupCommentNewView extends AbstractStatefulView {
     this._setState({
       comment: evt.target.value,
     });
-    this.#handleStateChange(this._state);
   };
 
   #formSubmitHandler = (evt) => {
@@ -93,19 +90,14 @@ export default class PopupCommentNewView extends AbstractStatefulView {
     this.updateElement({
       emotion: evt.target.dataset.emoji,
     });
-    this.#handleStateChange(this._state);
   };
 
   static parseCommentToState(comment) {
-    return {
-      ...comment,
-    };
+    return {...comment};
   }
 
   static parseStateToComment(state) {
     const comment = {...state};
-
-    // TODO scroll
 
     return comment;
   }

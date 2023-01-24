@@ -29,7 +29,6 @@ export default class FilmCardPresenter {
     this.#commentsModel = commentsModel;
 
     const prevFilmCardComponent = this.#filmCardComponent;
-    // const prevPopupPresenter = this.#popupPresenter;
 
     if (!this.#popupPresenter) {
       this.#popupPresenter = new PopupPresenter({
@@ -59,10 +58,7 @@ export default class FilmCardPresenter {
 
     if (this.#mode === Mode.POPUP) {
       replace(this.#filmCardComponent, prevFilmCardComponent);
-      this.#popupPresenter.removePopup();
-      this.#mode = Mode.POPUP;
-      // prevPopupPresenter.removePopup();
-      // this.#popupPresenter.popupScroll = prevPopupPresenter.popupScroll;
+      this.#popupPresenter.earsePopup();
       this.#popupPresenter.init({
         filmCard: this.#filmCard,
         commentsModel: this.#commentsModel,
