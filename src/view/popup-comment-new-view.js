@@ -78,15 +78,15 @@ export default class PopupCommentNewView extends AbstractStatefulView {
     });
   };
 
-  #formSubmitHandler = (evt) => {
-    evt.preventDefault();
-    this.#handleFormSubmit(this._state);
-  };
-
   #chooseEmojiHandler = (evt) => {
     evt.preventDefault();
     this.updateElement({
       emotion: evt.target.dataset.emoji,
     });
+  };
+
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit(this._state);
   };
 }
