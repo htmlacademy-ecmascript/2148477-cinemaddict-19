@@ -13,8 +13,6 @@ export default class FilmExtraPresenter {
   #filmExtraHeaderComponent = new FilmListHeaderView();
   #filmExtraContainerComponent = new FilmContainerView();
 
-  #mainBoardPresenter = null;
-
   #container = null;
   #filmsModel = null;
   #commentsModel = null;
@@ -30,9 +28,8 @@ export default class FilmExtraPresenter {
 
   #handleFilmCardChange = null;
 
-  constructor({mainBoardPresenter, filmsModel, commentsModel, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList}) {
-    this.#mainBoardPresenter = mainBoardPresenter;
-    this.#container = mainBoardPresenter.filmWrapperComponent;
+  constructor({container, filmsModel, commentsModel, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList}) {
+    this.#container = container;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
     this.#filmExtraCardCount = filmExtraCardCount;
@@ -41,9 +38,9 @@ export default class FilmExtraPresenter {
     this.#filmCardPresenterList = filmCardPresenterList;
   }
 
-  init() {
+  init({onFilmCardChange}) {
     this.#filmCards = [...this.#filmsModel.films];
-    this.#handleFilmCardChange = this.#mainBoardPresenter.handleFilmCardChange;
+    this.#handleFilmCardChange = onFilmCardChange;
 
     this.#renderFilmExtra();
   }
