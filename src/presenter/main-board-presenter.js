@@ -49,8 +49,9 @@ export default class MainBoardPresenter {
     this.#container = container;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
+
     this.#topRatedPresenter = new FilmExtraPresenter({
-      mainBoardPresenter: this,
+      container: this.#filmWrapperComponent,
       filmsModel: this.#filmsModel,
       commentsModel: this.#commentsModel,
       filmExtraCardCount: FILM_EXTRA_CARD_COUNT.topRated,
@@ -58,8 +59,9 @@ export default class MainBoardPresenter {
       filmExtraSortCB: sortTopRated,
       filmCardPresenterList: this.#filmCardPresenterList,
     });
+
     this.#mostCommentedPresenter = new FilmExtraPresenter({
-      mainBoardPresenter: this,
+      container: this.#filmWrapperComponent,
       filmsModel: this.#filmsModel,
       commentsModel: this.#commentsModel,
       filmExtraCardCount: FILM_EXTRA_CARD_COUNT.mostCommented,
@@ -67,11 +69,12 @@ export default class MainBoardPresenter {
       filmExtraSortCB: sortMostCommented,
       filmCardPresenterList: this.#filmCardPresenterList,
     });
+
     this.#headerPresenter = new HeaderPresenter();
   }
 
-  get filmWrapperComponent() {
-    return this.#filmWrapperComponent;
+  get films() {
+    return this.#filmsModel.films;
   }
 
   init() {
@@ -95,7 +98,7 @@ export default class MainBoardPresenter {
     }
   };
 
-  handleFilmCardChange = (updatedFilmCard) => {
+  #handleFilmCardChange = (updatedFilmCard) => {
     updateItem(this.#filmCards, updatedFilmCard);
     updateItem(this.#defaultFilmCards, updatedFilmCard);
     this.#filmCardPresenterList.get(updatedFilmCard.newId).forEach(
@@ -172,7 +175,7 @@ export default class MainBoardPresenter {
 
   #renderFilmCard(filmCard, commentsModel) {
     const filmCardPresenter = new FilmCardPresenter({
-      onFilmCardChange: this.handleFilmCardChange,
+      onFilmCardChange: this.#handleFilmCardChange,
       filmCardContainer: this.#filmContainerComponent.element,
       onModeChange: this.#handleModeChange,
     });
@@ -251,8 +254,8 @@ export default class MainBoardPresenter {
   }
 
   #renderExtra() {
-    this.#topRatedPresenter.init();
-    this.#mostCommentedPresenter.init();
+    this.#topRatedPresenter.init({onFilmCardChange: this.#handleFilmCardChange});
+    this.#mostCommentedPresenter.init({onFilmCardChange: this.#handleFilmCardChange});
   }
 
   #renderHeader() {
