@@ -70,6 +70,10 @@ export default class MainBoardPresenter {
     this.#headerPresenter = new HeaderPresenter();
   }
 
+  get films() {
+    return this.#filmsModel.films;
+  }
+
   init() {
     this.#filmCards = [...this.#filmsModel.films];
     this.#defaultFilmCards = [...this.#filmsModel.films];
