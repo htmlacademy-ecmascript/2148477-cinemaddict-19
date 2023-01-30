@@ -56,21 +56,21 @@ export default class FilmExtraPresenter {
   #renderFilmCard(filmCard, commentsModel) {
     const filmCardPresenter = new FilmCardPresenter({
       onFilmCardChange: this.#handleFilmCardChange,
+      popupContainer: this.#page,
       filmCardContainer: this.#filmExtraContainerComponent.element,
       onModeChange: this.#handleModeChange,
     });
 
     filmCardPresenter.init({
-      popupContainer: this.#page,
       filmCard,
       commentsModel,
     });
 
-    if ( this.#filmCardPresenterList.has(filmCard.newId) ) {
-      const updatedSameCardPresenters = this.#filmCardPresenterList.get(filmCard.newId);
+    if ( this.#filmCardPresenterList.has(filmCard.id) ) {
+      const updatedSameCardPresenters = this.#filmCardPresenterList.get(filmCard.id);
       updatedSameCardPresenters.push(filmCardPresenter);
       this.#filmCardPresenterList.set(
-        filmCard.newId,
+        filmCard.id,
         updatedSameCardPresenters,
       );
       return;
@@ -78,7 +78,7 @@ export default class FilmExtraPresenter {
 
     const sameCardPresenters = [];
     sameCardPresenters.push(filmCardPresenter);
-    this.#filmCardPresenterList.set(filmCard.newId, sameCardPresenters);
+    this.#filmCardPresenterList.set(filmCard.id, sameCardPresenters);
 
   }
 

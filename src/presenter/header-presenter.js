@@ -3,27 +3,27 @@ import { remove, render } from '../framework/render.js';
 
 export default class HeaderPresenter {
   #container = null;
-  #filmsModel = null;
+  #films = null;
 
   #userProfileComponent = null;
 
-  #alreadyWatched = 0;
+  #alreadyWatchedCount = 0;
 
   constructor() {
     this.#container = document.querySelector('.header');
   }
 
-  init({filmsModel}) {
-    this.#filmsModel = filmsModel;
+  init({films}) {
+    this.#films = films;
 
     if (this.#userProfileComponent !== null) {
       remove(this.#userProfileComponent);
     }
 
-    this.#alreadyWatched = [...this.#filmsModel.films].filter( (film) => film.userDetails.alreadyWatched).length;
-    this.#userProfileComponent = new UserProfileView({alreadyWatched: this.#alreadyWatched});
+    this.#alreadyWatchedCount = this.#films.filter( (film) => film.userDetails.alreadyWatched).length;
 
-    if (this.#alreadyWatched > 0) {
+    if (this.#alreadyWatchedCount > 0) {
+      this.#userProfileComponent = new UserProfileView({alreadyWatched: this.#alreadyWatchedCount});
       render(this.#userProfileComponent, this.#container);
     }
   }

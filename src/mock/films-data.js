@@ -259,8 +259,8 @@ const FILMS = [
 
 function getRandomFilmData() {
   return {
-    newId: nanoid(),
-    ...getRandomArrayElement(FILMS)
+    ...getRandomArrayElement(FILMS),
+    id: nanoid(),
   };
 }
 

@@ -1,7 +1,7 @@
 import PopupPresenter from './popup-presenter.js';
 import FilmCardView from '../view/film-card-view.js';
 import { render, remove, replace } from '../framework/render.js';
-import { Mode } from '../util/const.js';
+import { Mode, UserAction, UpdateType } from '../util/const.js';
 
 export default class FilmCardPresenter {
   #popupContainer = null;
@@ -17,16 +17,16 @@ export default class FilmCardPresenter {
 
   #mode = Mode.DEFAULT;
 
-  constructor({onFilmCardChange, filmCardContainer, onModeChange}) {
+  constructor({commentsModel, onFilmCardChange, popupContainer, filmCardContainer, onModeChange}) {
+    this.#commentsModel = commentsModel;
     this.#handleFilmCardChange = onFilmCardChange;
+    this.#popupContainer = popupContainer;
     this.#filmCardContainer = filmCardContainer;
     this.#handleModeChange = onModeChange;
   }
 
-  init({popupContainer, filmCard, commentsModel}) {
+  init({filmCard}) {
     this.#filmCard = filmCard;
-    this.#popupContainer = popupContainer;
-    this.#commentsModel = commentsModel;
 
     const prevFilmCardComponent = this.#filmCardComponent;
 
@@ -85,16 +85,45 @@ export default class FilmCardPresenter {
   };
 
   #handleWatchlistClick = () => {
-    this.#handleFilmCardChange({...this.#filmCard, userDetails: {...this.#filmCard.userDetails, watchlist: !this.#filmCard.userDetails.watchlist}});
+    this.#handleFilmCardChange(
+      UserAction.UPDATE_FILM_CARD,
+      UpdateType.MINOR,
+      {
+        ...this.#filmCard,
+        userDetails: {
+          ...this.#filmCard.userDetails,
+          watchlist: !this.#filmCard.userDetails.watchlist
+        }
+      }
+    );
   };
 
   #handleAlreadyWatchedClick = () => {
-    // TODO wathcing date
-    this.#handleFilmCardChange({...this.#filmCard, userDetails: {...this.#filmCard.userDetails, alreadyWatched: !this.#filmCard.userDetails.alreadyWatched}});
+    this.#handleFilmCardChange(
+      UserAction.UPDATE_FILM_CARD,
+      UpdateType.MINOR,
+      {
+        ...this.#filmCard,
+        userDetails: {
+          ...this.#filmCard.userDetails,
+          alreadyWatched: !this.#filmCard.userDetails.alreadyWatched
+        }
+      }
+    );
   };
 
   #handleFavoriteClick = () => {
-    this.#handleFilmCardChange({...this.#filmCard, userDetails: {...this.#filmCard.userDetails, favorite: !this.#filmCard.userDetails.favorite}});
+    this.#handleFilmCardChange(
+      UserAction.UPDATE_FILM_CARD,
+      UpdateType.MINOR,
+      {
+        ...this.#filmCard,
+        userDetails: {
+          ...this.#filmCard.userDetails,
+          favorite: !this.#filmCard.userDetails.favorite
+        }
+      }
+    );
   };
 
   #handleFilmCardClick = () => {
