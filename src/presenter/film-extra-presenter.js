@@ -14,7 +14,6 @@ export default class FilmExtraPresenter {
   #filmExtraContainerComponent = new FilmContainerView();
 
   #container = null;
-  #filmsModel = null;
   #commentsModel = null;
 
   #filmExtraHeader = '';
@@ -28,19 +27,18 @@ export default class FilmExtraPresenter {
 
   #handleFilmCardChange = null;
 
-  constructor({container, filmsModel, commentsModel, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList}) {
+  constructor({container, commentsModel, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList, onFilmCardChange}) {
     this.#container = container;
-    this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
     this.#filmExtraCardCount = filmExtraCardCount;
     this.#filmExtraHeader = filmExtraHeader;
     this.#filmExtraSortCB = filmExtraSortCB;
     this.#filmCardPresenterList = filmCardPresenterList;
+    this.#handleFilmCardChange = onFilmCardChange;
   }
 
-  init({onFilmCardChange}) {
-    this.#filmCards = [...this.#filmsModel.films];
-    this.#handleFilmCardChange = onFilmCardChange;
+  init({filmCards}) {
+    this.#filmCards = filmCards;
 
     this.#renderFilmExtra();
   }
@@ -55,6 +53,7 @@ export default class FilmExtraPresenter {
 
   #renderFilmCard(filmCard, commentsModel) {
     const filmCardPresenter = new FilmCardPresenter({
+      commentsModel,
       onFilmCardChange: this.#handleFilmCardChange,
       popupContainer: this.#page,
       filmCardContainer: this.#filmExtraContainerComponent.element,
@@ -63,7 +62,6 @@ export default class FilmExtraPresenter {
 
     filmCardPresenter.init({
       filmCard,
-      commentsModel,
     });
 
     if ( this.#filmCardPresenterList.has(filmCard.id) ) {
@@ -102,17 +100,6 @@ export default class FilmExtraPresenter {
   #renderFilmList() {
     this.#renderFilmCards(0, Math.min(this.#filmExtraCards.length, this.#filmExtraCardCount));
   }
-
-  #clearFilmList() {
-    this.#filmCardPresenterList.forEach(
-      (presentersArr) => presentersArr.forEach(
-        (presenter) => presenter.destroy()
-      )
-    );
-
-    this.#filmCardPresenterList.clear();
-  }
-
 
   #renderFilmExtra() {
     if (!this.#container.element.contains(this.#filmExtraListComponent.element)) {
