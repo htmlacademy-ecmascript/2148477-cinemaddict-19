@@ -6,14 +6,15 @@ import FilmListHeaderView from '../view/film-list-header-view.js';
 import FilmContainerView from '../view/film-container-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 
-import FilterBarPresenter from './filters-presenter.js';
+import FilterBarPresenter from './filter-bar-presenter.js';
 import FilmCardPresenter from './film-card-presenter.js';
 import FilmExtraPresenter from './film-extra-presenter.js';
 import HeaderPresenter from './header-presenter.js';
 
-import { remove, render, RenderPosition } from '../framework/render.js';
+import { remove, render, replace, RenderPosition } from '../framework/render.js';
 import { sortMainDate, sortMainRating, sortTopRated, sortMostCommented } from '../util/sort-film-cards.js';
-import { SortType, UpdateType, UserAction, FILM_EXTRA_CARD_COUNT, FILM_EXTRA_HEADER } from '../util/const.js';
+import { filter } from '../util/film-card-filter.js';
+import { SortType, UpdateType, UserAction, FILM_EXTRA_CARD_COUNT, FILM_EXTRA_HEADER, FilterType } from '../util/const.js';
 
 const FILM_CARDS_COUNT_PER_STEP = 5;
 
@@ -37,15 +38,17 @@ export default class MainBoardPresenter {
   #container = null;
   #filmsModel = null;
   #commentsModel = null;
+  #filterModel = null;
 
   #renderedFilmCardsCount = FILM_CARDS_COUNT_PER_STEP;
   #filmCardPresenterList = new Map();
   #currentSortType = SortType.DEFAULT;
 
-  constructor({container, filmsModel, commentsModel}) {
+  constructor({container, filmsModel, commentsModel, filterModel}) {
     this.#container = container;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
+    this.#filterModel = filterModel;
     this.#topRatedPresenter = new FilmExtraPresenter({
       container: this.#filmWrapperComponent,
       commentsModel: this.#commentsModel,
@@ -64,20 +67,30 @@ export default class MainBoardPresenter {
       filmCardPresenterList: this.#filmCardPresenterList,
       onFilmCardChange: this.#handleViewAction,
     });
+    this.#filterBarPresenter = new FilterBarPresenter({
+      container: this.#container,
+      filmsModel: this.#filmsModel,
+      filterModel: this.#filterModel,
+    });
     this.#headerPresenter = new HeaderPresenter();
 
     this.#filmsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get films() {
+    const filterType = this.#filterModel.filter;
+    const films = this.#filmsModel.films;
+    const filteredFilmCards = filter[filterType](films);
+
     switch (this.#currentSortType) {
       case SortType.DATE:
-        return [...this.#filmsModel.films].sort(sortMainDate);
+        return filteredFilmCards.sort(sortMainDate);
       case SortType.RATING:
-        return [...this.#filmsModel.films].sort(sortMainRating);
+        return filteredFilmCards.sort(sortMainRating);
     }
 
-    return this.#filmsModel.films;
+    return filteredFilmCards;
   }
 
   init() {
@@ -130,15 +143,18 @@ export default class MainBoardPresenter {
         break;
       case UpdateType.MINOR:
         // - обновить карточку, хедэр и филтер-бар
-        this.#filmCardPresenterList.get(data.id).forEach(
-          (presenter) => presenter.init({
-            filmCard: data,
-          })
-        );
-
-        this.#renderFilterBar();
         this.#renderHeader();
 
+        this.#filmCardPresenterList.get(data.id).forEach(
+          (presenter) => {
+            presenter.init({filmCard: data});
+            // if (presenter.isMainBoard && !data.userDetails[this.#filterModel.filter]) {
+            //   presenter.destroy();
+            // }
+          }
+        );
+        // this.#clearMainBoard();
+        // this.#renderMainBoard();
         break;
       case UpdateType.MAJOR:
         // - обновить всю доску (например, при переключении фильтра)
@@ -159,28 +175,20 @@ export default class MainBoardPresenter {
   };
 
   #renderSortBar() {
-    if (this.#sortBarComponent !== null) {
-      remove(this.#sortBarComponent);
-    }
+    const prevSortBarComponent = this.#sortBarComponent;
 
     this.#sortBarComponent = new SortBarView({
       onSortTypeChange: this.#handleSortTypeChange,
       currentSortType: this.#currentSortType,
     });
 
-    render(this.#sortBarComponent, this.#container, RenderPosition.AFTERBEGIN);
-  }
-
-  #renderFilterBar() {
-    const prevFilterBarPresenter = this.#filterBarPresenter;
-
-    this.#filterBarPresenter = new FilterBarPresenter({container: this.#container});
-
-    if (prevFilterBarPresenter !== null) {
-      prevFilterBarPresenter.removeFilterBar();
+    if (prevSortBarComponent === null) {
+      render(this.#sortBarComponent, this.#container, RenderPosition.AFTERBEGIN);
+      return;
     }
 
-    this.#filterBarPresenter.init({filmsModel: this.#filmsModel});
+    replace(this.#sortBarComponent, prevSortBarComponent);
+    remove(prevSortBarComponent);
   }
 
   #renderFilmCard(filmCard, commentsModel) {
@@ -190,6 +198,7 @@ export default class MainBoardPresenter {
       popupContainer: this.#page,
       filmCardContainer: this.#filmContainerComponent.element,
       onModeChange: this.#handleModeChange,
+      isMainBoard: true,
     });
 
     filmCardPresenter.init({
@@ -269,7 +278,7 @@ export default class MainBoardPresenter {
     }
 
     this.#renderSortBar();
-    this.#renderFilterBar();
+    this.#filterBarPresenter.init();
 
     render(this.#filmHeaderComponent, this.#filmListComponent.element);
 
@@ -284,8 +293,8 @@ export default class MainBoardPresenter {
   }
 
   #renderExtra() {
-    this.#topRatedPresenter.init({filmCards: [...this.films]});
-    this.#mostCommentedPresenter.init({filmCards: [...this.films]});
+    this.#topRatedPresenter.init({filmCards: [...this.#filmsModel.films]});
+    this.#mostCommentedPresenter.init({filmCards: [...this.#filmsModel.films]});
   }
 
   #renderHeader() {

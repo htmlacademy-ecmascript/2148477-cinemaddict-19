@@ -1,8 +1,8 @@
 import AbstractView from '../framework/view/abstract-view';
 
-function createFilterBarTemplate(filterItems) {
+function createFilterBarTemplate(filterItems, currentFilterType) {
   const filterItemsTemplate = filterItems
-    .map((filter, index) => createFilterItemTemplate(filter, index))
+    .map((filter) => createFilterItemTemplate(filter, currentFilterType))
     .join('');
 
   return (
@@ -12,13 +12,14 @@ function createFilterBarTemplate(filterItems) {
   );
 }
 
-function createFilterItemTemplate(filter, isChecked) {
-  const {name, count} = filter;
+function createFilterItemTemplate(filter, currentFilterType) {
+  const {type, name, count} = filter;
 
   return (
     `<a
       href="#${name.toLowerCase()}"
-      class="main-navigation__item${isChecked ? '' : ' main-navigation__item--active'}"
+      class="main-navigation__item${type === currentFilterType ? ' main-navigation__item--active' : ''}"
+      data-filter="${type}"
     >
       ${name === 'All' ? `${name} movies` : `${name} <span class="main-navigation__item-count">${count}</span>`}
     </a>`
@@ -27,13 +28,24 @@ function createFilterItemTemplate(filter, isChecked) {
 
 export default class FilterBarView extends AbstractView {
   #filters = null;
+  #currentFilter = null;
+  #handleFilterTypeChange = null;
 
-  constructor({filters}) {
+  constructor({filters, currentFilterType, onFilterTypeChange}) {
     super();
     this.#filters = filters;
+    this.#currentFilter = currentFilterType;
+    this.#handleFilterTypeChange = onFilterTypeChange;
+
+    this.element.addEventListener('click', this.#filterTypeChangeHandler);
   }
 
   get template() {
-    return createFilterBarTemplate(this.#filters);
+    return createFilterBarTemplate(this.#filters, this.#currentFilter);
   }
+
+  #filterTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFilterTypeChange(evt.target.dataset.filter);
+  };
 }

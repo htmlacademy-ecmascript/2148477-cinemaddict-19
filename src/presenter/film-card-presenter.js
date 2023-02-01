@@ -17,12 +17,13 @@ export default class FilmCardPresenter {
 
   #mode = Mode.DEFAULT;
 
-  constructor({commentsModel, onFilmCardChange, popupContainer, filmCardContainer, onModeChange}) {
+  constructor({commentsModel, onFilmCardChange, popupContainer, filmCardContainer, onModeChange, isMainBoard}) {
     this.#commentsModel = commentsModel;
     this.#handleFilmCardChange = onFilmCardChange;
     this.#popupContainer = popupContainer;
     this.#filmCardContainer = filmCardContainer;
     this.#handleModeChange = onModeChange;
+    this.isMainBoard = isMainBoard;
   }
 
   init({filmCard}) {
@@ -72,6 +73,7 @@ export default class FilmCardPresenter {
 
   destroy() {
     remove(this.#filmCardComponent);
+    this.#filmCardComponent = null;
   }
 
   resetView() {
