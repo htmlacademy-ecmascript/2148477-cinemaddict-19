@@ -7,6 +7,7 @@ import PopupCommentNewView from '../view/popup-comment-new-view.js';
 import PopupCommentView from '../view/popup-comment-view.js';
 import { render, remove } from '../framework/render.js';
 import { Mode } from '../util/const.js';
+import { UserAction, UpdateType } from '../util/const.js';
 
 export default class PopupPresenter {
   #popupComponent = new PopupView();
@@ -18,11 +19,11 @@ export default class PopupPresenter {
   #container = null;
   #filmCard = null;
   #commentsModel = null;
-  #handleWatchlistClick = null;
-  #handleAlreadyWatchedClick = null;
-  #handleFavoriteClick = null;
+  #handleViewAction = null;
   #handlePopupRemoval = null;
   #mode = null;
+
+  #filmsModel = null;
 
   #popupFilmDetailsComponent = null;
   #popupCommentHeaderComponent = null;
@@ -30,18 +31,19 @@ export default class PopupPresenter {
   #comments = [];
   #commentViews = [];
 
-  constructor({container, onWatchlistClick, onAlreadyWatchedClick, onFavoriteClick}) {
+  constructor({filmsModel, commentsModel, container, onViewAction, onPopupRemove, mode}) {
     this.#container = container;
-    this.#handleWatchlistClick = onWatchlistClick;
-    this.#handleAlreadyWatchedClick = onAlreadyWatchedClick;
-    this.#handleFavoriteClick = onFavoriteClick;
-  }
-
-  init({filmCard, commentsModel, onPopupRemove, mode}) {
-    this.#filmCard = filmCard;
+    this.#handleViewAction = onViewAction;
+    this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
     this.#handlePopupRemoval = onPopupRemove;
     this.#mode = mode;
+
+    this.#filmsModel.addObserver(this.#handleModelEvent);
+  }
+
+  init(filmCard) {
+    this.#filmCard = filmCard;
 
     this.#popupCommentHeaderComponent = new PopupCommentHeaderView({filmCard: this.#filmCard});
 
@@ -80,10 +82,17 @@ export default class PopupPresenter {
 
     // render popup block
 
-    if (this.#mode === Mode.POPUP) {
+    if (this.#mode() === Mode.POPUP) {
       this.#popupComponent.restoreScroll();
     }
   }
+
+  #handleModelEvent = () => {
+    if (this.#mode() === Mode.POPUP) {
+      this.earsePopup();
+      this.init(this.#filmsModel.films.find( (element) => element.id === this.#filmCard.id));
+    }
+  };
 
   earsePopup = () => {
     remove(this.#popupFilmDetailsComponent);
@@ -121,14 +130,44 @@ export default class PopupPresenter {
   };
 
   #watchlistClickHandler = () => {
-    this.#handleWatchlistClick();
+    this.#handleViewAction(
+      UserAction.UPDATE_FILM_CARD,
+      UpdateType.MINOR,
+      {
+        ...this.#filmCard,
+        userDetails: {
+          ...this.#filmCard.userDetails,
+          watchlist: !this.#filmCard.userDetails.watchlist
+        }
+      }
+    );
   };
 
   #alreadyWatchedClickHandler = () => {
-    this.#handleAlreadyWatchedClick();
+    this.#handleViewAction(
+      UserAction.UPDATE_FILM_CARD,
+      UpdateType.MINOR,
+      {
+        ...this.#filmCard,
+        userDetails: {
+          ...this.#filmCard.userDetails,
+          alreadyWatched: !this.#filmCard.userDetails.alreadyWatched
+        }
+      }
+    );
   };
 
   #favoriteClickHandler = () => {
-    this.#handleFavoriteClick();
+    this.#handleViewAction(
+      UserAction.UPDATE_FILM_CARD,
+      UpdateType.MINOR,
+      {
+        ...this.#filmCard,
+        userDetails: {
+          ...this.#filmCard.userDetails,
+          favorite: !this.#filmCard.userDetails.favorite
+        }
+      }
+    );
   };
 }

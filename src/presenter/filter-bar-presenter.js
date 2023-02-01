@@ -46,18 +46,6 @@ export default class FilterBarPresenter {
     ];
   }
 
-  // init() {
-  //   this.#filterNameCount = getFilterNameCount(this.#filmsModel.films);
-
-  //   this.#filterBarComponent = new FilterBarView({filters: this.#filterNameCount});
-
-  //   render(this.#filterBarComponent, this.#container, RenderPosition.AFTERBEGIN);
-  // }
-
-  // removeFilterBar = () => {
-  //   remove(this.#filterBarComponent);
-  // };
-
   init() {
     const filters = this.filters;
     const prevFilterComponent = this.#filterBarComponent;

@@ -6,6 +6,7 @@ import FilmListHeaderView from '../view/film-list-header-view.js';
 import FilmContainerView from '../view/film-container-view.js';
 import ShowMoreButtonView from '../view/show-more-button-view.js';
 
+import PopupPresenter from './popup-presenter.js';
 import FilterBarPresenter from './filter-bar-presenter.js';
 import FilmCardPresenter from './film-card-presenter.js';
 import FilmExtraPresenter from './film-extra-presenter.js';
@@ -14,7 +15,7 @@ import HeaderPresenter from './header-presenter.js';
 import { remove, render, replace, RenderPosition } from '../framework/render.js';
 import { sortMainDate, sortMainRating, sortTopRated, sortMostCommented } from '../util/sort-film-cards.js';
 import { filter } from '../util/film-card-filter.js';
-import { SortType, UpdateType, UserAction, FILM_EXTRA_CARD_COUNT, FILM_EXTRA_HEADER, FilterType } from '../util/const.js';
+import { Mode, SortType, UpdateType, UserAction, FILM_EXTRA_CARD_COUNT, FILM_EXTRA_HEADER, FilterType } from '../util/const.js';
 
 const FILM_CARDS_COUNT_PER_STEP = 5;
 
@@ -30,6 +31,7 @@ export default class MainBoardPresenter {
   #sortBarComponent = null;
   #noFilmCardsComponent = new NoFilmCardsView();
 
+  #popupPresenter = null;
   #filterBarPresenter = null;
   #topRatedPresenter = null;
   #mostCommentedPresenter = null;
@@ -44,11 +46,21 @@ export default class MainBoardPresenter {
   #filmCardPresenterList = new Map();
   #currentSortType = SortType.DEFAULT;
 
+  mode = Mode.DEFAULT;
+
   constructor({container, filmsModel, commentsModel, filterModel}) {
     this.#container = container;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
     this.#filterModel = filterModel;
+    this.#popupPresenter = new PopupPresenter({
+      container: this.#page,
+      filmsModel,
+      commentsModel,
+      onViewAction: this.#handleViewAction,
+      onPopupRemove: this.#resetMode,
+      mode: this.#getMode,
+    });
     this.#topRatedPresenter = new FilmExtraPresenter({
       container: this.#filmWrapperComponent,
       commentsModel: this.#commentsModel,
@@ -112,12 +124,16 @@ export default class MainBoardPresenter {
     }
   };
 
-  #handleModeChange = () => {
-    this.#filmCardPresenterList.forEach(
-      (presentersArr) => presentersArr.forEach(
-        (presenter) => presenter.resetView()
-      )
-    );
+  #resetMode = () => {
+    this.mode = Mode.DEFAULT;
+  };
+
+  #getMode = () => this.mode;
+
+  #handleModeChange = (filmCard) => {
+    this.#popupPresenter.removePopup();
+    this.#popupPresenter.init(filmCard);
+    this.mode = Mode.POPUP;
   };
 
   #handleViewAction = (actionType, updateType, update) => {
@@ -142,23 +158,25 @@ export default class MainBoardPresenter {
         // - обновить карточку и экстра презентер при необходимости
         break;
       case UpdateType.MINOR:
-        // - обновить карточку, хедэр и филтер-бар
+        // - обновить карточку, хедэр и филтер-бар (филтер-бар сам обновится)
         this.#renderHeader();
+
+        if (this.#filterModel.filter !== FilterType.ALL) {
+          this.#clearMainBoard();
+          this.#renderMainBoard();
+          break;
+        }
 
         this.#filmCardPresenterList.get(data.id).forEach(
           (presenter) => {
             presenter.init({filmCard: data});
-            // if (presenter.isMainBoard && !data.userDetails[this.#filterModel.filter]) {
-            //   presenter.destroy();
-            // }
           }
         );
-        // this.#clearMainBoard();
-        // this.#renderMainBoard();
+
         break;
       case UpdateType.MAJOR:
         // - обновить всю доску (например, при переключении фильтра)
-        this.#clearMainBoard();
+        this.#clearMainBoard({resetRenderedFilmCardsCount: true});
         this.#renderMainBoard();
         break;
     }
@@ -191,11 +209,9 @@ export default class MainBoardPresenter {
     remove(prevSortBarComponent);
   }
 
-  #renderFilmCard(filmCard, commentsModel) {
+  #renderFilmCard(filmCard) {
     const filmCardPresenter = new FilmCardPresenter({
-      commentsModel,
       onFilmCardChange: this.#handleViewAction,
-      popupContainer: this.#page,
       filmCardContainer: this.#filmContainerComponent.element,
       onModeChange: this.#handleModeChange,
       isMainBoard: true,
@@ -221,7 +237,7 @@ export default class MainBoardPresenter {
   }
 
   #renderFilmCards(filmCards) {
-    filmCards.forEach((filmCard) => this.#renderFilmCard(filmCard, this.#commentsModel));
+    filmCards.forEach((filmCard) => this.#renderFilmCard(filmCard));
   }
 
   #renderNoFilms() {
