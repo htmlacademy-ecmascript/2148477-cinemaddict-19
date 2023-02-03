@@ -1,4 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
+import { FilterType } from '../util/const';
 
 function createFilterBarTemplate(filterItems, currentFilterType) {
   const filterItemsTemplate = filterItems
@@ -21,7 +22,7 @@ function createFilterItemTemplate(filter, currentFilterType) {
       class="main-navigation__item${type === currentFilterType ? ' main-navigation__item--active' : ''}"
       data-filter="${type}"
     >
-      ${name === 'All' ? `${name} movies` : `${name} <span class="main-navigation__item-count">${count}</span>`}
+      ${type === FilterType.ALL ? name : `${name} <span class="main-navigation__item-count">${count}</span>`}
     </a>`
   );
 }

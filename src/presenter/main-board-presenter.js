@@ -29,7 +29,7 @@ export default class MainBoardPresenter {
   #filmContainerComponent = new FilmContainerView();
   #showMoreButtonComponent = null;
   #sortBarComponent = null;
-  #noFilmCardsComponent = new NoFilmCardsView();
+  #noFilmCardsComponent = null;
 
   #popupPresenter = null;
   #filterBarPresenter = null;
@@ -39,19 +39,18 @@ export default class MainBoardPresenter {
 
   #container = null;
   #filmsModel = null;
-  #commentsModel = null;
   #filterModel = null;
 
   #renderedFilmCardsCount = FILM_CARDS_COUNT_PER_STEP;
   #filmCardPresenterList = new Map();
   #currentSortType = SortType.DEFAULT;
+  #currentFilterType = FilterType.ALL;
 
   mode = Mode.DEFAULT;
 
   constructor({container, filmsModel, commentsModel, filterModel}) {
     this.#container = container;
     this.#filmsModel = filmsModel;
-    this.#commentsModel = commentsModel;
     this.#filterModel = filterModel;
     this.#popupPresenter = new PopupPresenter({
       container: this.#page,
@@ -63,21 +62,23 @@ export default class MainBoardPresenter {
     });
     this.#topRatedPresenter = new FilmExtraPresenter({
       container: this.#filmWrapperComponent,
-      commentsModel: this.#commentsModel,
       filmExtraCardCount: FILM_EXTRA_CARD_COUNT.topRated,
       filmExtraHeader: FILM_EXTRA_HEADER.topRated,
       filmExtraSortCB: sortTopRated,
       filmCardPresenterList: this.#filmCardPresenterList,
       onFilmCardChange: this.#handleViewAction,
+      popupPresenter: this.#popupPresenter,
+      mode: this.#setMode,
     });
     this.#mostCommentedPresenter = new FilmExtraPresenter({
       container: this.#filmWrapperComponent,
-      commentsModel: this.#commentsModel,
       filmExtraCardCount: FILM_EXTRA_CARD_COUNT.mostCommented,
       filmExtraHeader: FILM_EXTRA_HEADER.mostCommented,
       filmExtraSortCB: sortMostCommented,
       filmCardPresenterList: this.#filmCardPresenterList,
       onFilmCardChange: this.#handleViewAction,
+      popupPresenter: this.#popupPresenter,
+      mode: this.#setMode,
     });
     this.#filterBarPresenter = new FilterBarPresenter({
       container: this.#container,
@@ -91,9 +92,9 @@ export default class MainBoardPresenter {
   }
 
   get films() {
-    const filterType = this.#filterModel.filter;
+    this.#currentFilterType = this.#filterModel.filter;
     const films = this.#filmsModel.films;
-    const filteredFilmCards = filter[filterType](films);
+    const filteredFilmCards = filter[this.#currentFilterType](films);
 
     switch (this.#currentSortType) {
       case SortType.DATE:
@@ -130,6 +131,10 @@ export default class MainBoardPresenter {
 
   #getMode = () => this.mode;
 
+  #setMode = (newMode) => {
+    this.mode = newMode;
+  };
+
   #handleModeChange = (filmCard) => {
     this.#popupPresenter.removePopup();
     this.#popupPresenter.init(filmCard);
@@ -162,7 +167,7 @@ export default class MainBoardPresenter {
         this.#renderHeader();
 
         if (this.#filterModel.filter !== FilterType.ALL) {
-          this.#clearMainBoard();
+          this.#clearMainBoard({resetRenderedFilmCardsCount: (this.films.length < 5)});
           this.#renderMainBoard();
           break;
         }
@@ -172,7 +177,6 @@ export default class MainBoardPresenter {
             presenter.init({filmCard: data});
           }
         );
-
         break;
       case UpdateType.MAJOR:
         // - обновить всю доску (например, при переключении фильтра)
@@ -217,9 +221,7 @@ export default class MainBoardPresenter {
       isMainBoard: true,
     });
 
-    filmCardPresenter.init({
-      filmCard,
-    });
+    filmCardPresenter.init({filmCard});
 
     if ( this.#filmCardPresenterList.has(filmCard.id) ) {
       const updatedSameCardPresenters = this.#filmCardPresenterList.get(filmCard.id);
@@ -241,6 +243,8 @@ export default class MainBoardPresenter {
   }
 
   #renderNoFilms() {
+    this.#noFilmCardsComponent = new NoFilmCardsView({filterType: this.#currentFilterType});
+
     render(this.#noFilmCardsComponent, this.#filmListComponent.element, RenderPosition.AFTERBEGIN);
   }
 
@@ -259,8 +263,11 @@ export default class MainBoardPresenter {
     );
     this.#filmCardPresenterList.clear();
 
-    remove(this.#noFilmCardsComponent);
     remove(this.#showMoreButtonComponent);
+
+    if (this.#noFilmCardsComponent) {
+      remove(this.#noFilmCardsComponent);
+    }
 
     if (resetRenderedFilmCardsCount) {
       this.#renderedFilmCardsCount = FILM_CARDS_COUNT_PER_STEP;
@@ -288,13 +295,14 @@ export default class MainBoardPresenter {
     const filmCards = this.films;
     const filmCardsCount = filmCards.length;
 
+    this.#renderSortBar();
+    this.#filterBarPresenter.init();
+    this.#renderExtra();
+
     if (filmCardsCount === 0) {
       this.#renderNoFilms();
       return;
     }
-
-    this.#renderSortBar();
-    this.#filterBarPresenter.init();
 
     render(this.#filmHeaderComponent, this.#filmListComponent.element);
 
@@ -304,8 +312,6 @@ export default class MainBoardPresenter {
     if (filmCardsCount > this.#renderedFilmCardsCount) {
       this.#renderShowMoreButton();
     }
-
-    this.#renderExtra();
   }
 
   #renderExtra() {

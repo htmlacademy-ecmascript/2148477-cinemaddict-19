@@ -16,7 +16,7 @@ const Emotion = {
 };
 
 const FilterType = {
-  ALL: 'All',
+  ALL: 'all',
   WATCHLIST: 'watchlist',
   HISTORY: 'alreadyWatched',
   FAVORITES: 'favorite',

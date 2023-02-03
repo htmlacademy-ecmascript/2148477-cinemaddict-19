@@ -5,16 +5,14 @@ import FilmContainerView from '../view/film-container-view.js';
 import FilmCardPresenter from './film-card-presenter.js';
 
 import { render } from '../framework/render.js';
+import { Mode } from '../util/const.js';
 
 export default class FilmExtraPresenter {
-  #page = document.querySelector('.page');
-
   #filmExtraListComponent = new FilmListView();
   #filmExtraHeaderComponent = new FilmListHeaderView();
   #filmExtraContainerComponent = new FilmContainerView();
 
   #container = null;
-  #commentsModel = null;
 
   #filmExtraHeader = '';
   #filmExtraCardCount = 0;
@@ -24,17 +22,19 @@ export default class FilmExtraPresenter {
   #filmExtraCards = [];
 
   #filmCardPresenterList = null;
+  #popupPresenter = null;
 
   #handleFilmCardChange = null;
 
-  constructor({container, commentsModel, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList, onFilmCardChange}) {
+  constructor({container, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList, onFilmCardChange, popupPresenter, mode}) {
     this.#container = container;
-    this.#commentsModel = commentsModel;
     this.#filmExtraCardCount = filmExtraCardCount;
     this.#filmExtraHeader = filmExtraHeader;
     this.#filmExtraSortCB = filmExtraSortCB;
     this.#filmCardPresenterList = filmCardPresenterList;
     this.#handleFilmCardChange = onFilmCardChange;
+    this.#popupPresenter = popupPresenter;
+    this.mode = mode;
   }
 
   init({filmCards}) {
@@ -43,19 +43,15 @@ export default class FilmExtraPresenter {
     this.#renderFilmExtra();
   }
 
-  #handleModeChange = () => {
-    this.#filmCardPresenterList.forEach(
-      (presentersArr) => presentersArr.forEach(
-        (presenter) => presenter.resetView()
-      )
-    );
+  #handleModeChange = (filmCard) => {
+    this.#popupPresenter.removePopup();
+    this.#popupPresenter.init(filmCard);
+    this.mode(Mode.POPUP);
   };
 
-  #renderFilmCard(filmCard, commentsModel) {
+  #renderFilmCard(filmCard) {
     const filmCardPresenter = new FilmCardPresenter({
-      commentsModel,
       onFilmCardChange: this.#handleFilmCardChange,
-      popupContainer: this.#page,
       filmCardContainer: this.#filmExtraContainerComponent.element,
       onModeChange: this.#handleModeChange,
     });
@@ -83,7 +79,7 @@ export default class FilmExtraPresenter {
   #renderFilmCards(from, to) {
     this.#filmCards
       .slice(from, to)
-      .forEach((filmCard) => this.#renderFilmCard(filmCard, this.#commentsModel));
+      .forEach((filmCard) => this.#renderFilmCard(filmCard));
   }
 
   #renderFilmContainer() {
