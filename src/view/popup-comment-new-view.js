@@ -47,7 +47,7 @@ function createPopupCommentNewTemplate(comment) {
 
 export default class PopupCommentNewView extends AbstractStatefulView {
   #handleFormSubmit = null;
-
+  #keysPressed = {};
 
   constructor({comment = NEW_COMMENT, onFormSubmit}) {
     super();
@@ -62,11 +62,17 @@ export default class PopupCommentNewView extends AbstractStatefulView {
   }
 
   reset() {
-    this.updateElement({...NEW_COMMENT});
+    this.updateElement(
+      PopupCommentNewView.parseCommentToState(NEW_COMMENT),
+    );
   }
 
   _restoreHandlers() {
-    this.element.addEventListener('submit', this.#formSubmitHandler);
+    document.addEventListener('keydown', this.#formSubmitHandler);
+
+    document.addEventListener('keyup', (evt) => {
+      delete this.#keysPressed[evt.key];
+    });
     this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#chooseEmojiHandler);
     this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#commentInputHandler);
   }
@@ -78,6 +84,16 @@ export default class PopupCommentNewView extends AbstractStatefulView {
     });
   };
 
+  #formSubmitHandler = (evt) => {
+    this.#keysPressed[evt.key] = true;
+    if (this.#keysPressed['Control'] && evt.key === 'Enter') {
+      if (this._state.comment !== '' && this._state.emotion !== '') {
+        this.#handleFormSubmit(PopupCommentNewView.parseStateToComment(this._state));
+        this.reset();
+      }
+    }
+  };
+
   #chooseEmojiHandler = (evt) => {
     evt.preventDefault();
     this.updateElement({
@@ -85,8 +101,13 @@ export default class PopupCommentNewView extends AbstractStatefulView {
     });
   };
 
-  #formSubmitHandler = (evt) => {
-    evt.preventDefault();
-    this.#handleFormSubmit(this._state);
-  };
+  static parseCommentToState(comment) {
+    return {...comment};
+  }
+
+  static parseStateToComment(state) {
+    const comment = {...state};
+
+    return comment;
+  }
 }

@@ -16,10 +16,10 @@ const Emotion = {
 };
 
 const FilterType = {
-  ALL: 'All',
-  WATCHLIST: 'Watchlist',
-  HISTORY: 'History',
-  FAVORITES: 'Favorites',
+  ALL: 'all',
+  WATCHLIST: 'watchlist',
+  HISTORY: 'alreadyWatched',
+  FAVORITES: 'favorite',
 };
 
 const SortType = {
@@ -33,6 +33,18 @@ const Mode = {
   POPUP: 'POPUP',
 };
 
+const UserAction = {
+  UPDATE_FILM_CARD: 'UPDATE_FILM_CARD',
+  ADD_COMMENT: 'ADD_COMMENT',
+  DELETE_COMMENT: 'DELETE_COMMENT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
 const FILM_EXTRA_HEADER = {
   topRated: 'Top Rated',
   mostCommented: 'Most Commented',
@@ -44,4 +56,4 @@ const FILM_EXTRA_CARD_COUNT = {
 };
 
 
-export {POSTERS, Emotion, FilterType, SortType, Mode, FILM_EXTRA_HEADER, FILM_EXTRA_CARD_COUNT};
+export {POSTERS, Emotion, FilterType, SortType, Mode, UserAction, UpdateType, FILM_EXTRA_HEADER, FILM_EXTRA_CARD_COUNT};

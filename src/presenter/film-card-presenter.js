@@ -1,43 +1,28 @@
-import PopupPresenter from './popup-presenter.js';
 import FilmCardView from '../view/film-card-view.js';
 import { render, remove, replace } from '../framework/render.js';
-import { Mode } from '../util/const.js';
+import { UserAction, UpdateType } from '../util/const.js';
 
 export default class FilmCardPresenter {
-  #popupContainer = null;
   #filmCardContainer = null;
+
   #handleFilmCardChange = null;
   #handleModeChange = null;
 
   #filmCardComponent = null;
-  #popupPresenter = null;
-  #commentsModel = null;
 
   #filmCard = null;
 
-  #mode = Mode.DEFAULT;
-
-  constructor({onFilmCardChange, filmCardContainer, onModeChange}) {
+  constructor({onFilmCardChange, filmCardContainer, onModeChange, isMainBoard = false}) {
     this.#handleFilmCardChange = onFilmCardChange;
     this.#filmCardContainer = filmCardContainer;
     this.#handleModeChange = onModeChange;
+    this.isMainBoard = isMainBoard;
   }
 
-  init({popupContainer, filmCard, commentsModel}) {
+  init({filmCard}) {
     this.#filmCard = filmCard;
-    this.#popupContainer = popupContainer;
-    this.#commentsModel = commentsModel;
 
     const prevFilmCardComponent = this.#filmCardComponent;
-
-    if (!this.#popupPresenter) {
-      this.#popupPresenter = new PopupPresenter({
-        container: this.#popupContainer,
-        onWatchlistClick: this.#handleWatchlistClick,
-        onAlreadyWatchedClick: this.#handleAlreadyWatchedClick,
-        onFavoriteClick: this.#handleFavoriteClick,
-      });
-    }
 
     this.#filmCardComponent = new FilmCardView({
       filmCard: this.#filmCard,
@@ -52,20 +37,7 @@ export default class FilmCardPresenter {
       return;
     }
 
-    if (this.#mode === Mode.DEFAULT) {
-      replace(this.#filmCardComponent, prevFilmCardComponent);
-    }
-
-    if (this.#mode === Mode.POPUP) {
-      replace(this.#filmCardComponent, prevFilmCardComponent);
-      this.#popupPresenter.earsePopup();
-      this.#popupPresenter.init({
-        filmCard: this.#filmCard,
-        commentsModel: this.#commentsModel,
-        onPopupRemove: this.#resetMode,
-        mode: this.#mode,
-      });
-    }
+    replace(this.#filmCardComponent, prevFilmCardComponent);
 
     remove(prevFilmCardComponent);
   }
@@ -74,36 +46,49 @@ export default class FilmCardPresenter {
     remove(this.#filmCardComponent);
   }
 
-  resetView() {
-    if (this.#mode !== Mode.DEFAULT) {
-      this.#popupPresenter.removePopup();
-    }
-  }
-
-  #resetMode = () => {
-    this.#mode = Mode.DEFAULT;
-  };
-
   #handleWatchlistClick = () => {
-    this.#handleFilmCardChange({...this.#filmCard, userDetails: {...this.#filmCard.userDetails, watchlist: !this.#filmCard.userDetails.watchlist}});
+    this.#handleFilmCardChange(
+      UserAction.UPDATE_FILM_CARD,
+      UpdateType.MINOR,
+      {
+        ...this.#filmCard,
+        userDetails: {
+          ...this.#filmCard.userDetails,
+          watchlist: !this.#filmCard.userDetails.watchlist
+        }
+      }
+    );
   };
 
   #handleAlreadyWatchedClick = () => {
-    // TODO wathcing date
-    this.#handleFilmCardChange({...this.#filmCard, userDetails: {...this.#filmCard.userDetails, alreadyWatched: !this.#filmCard.userDetails.alreadyWatched}});
+    this.#handleFilmCardChange(
+      UserAction.UPDATE_FILM_CARD,
+      UpdateType.MINOR,
+      {
+        ...this.#filmCard,
+        userDetails: {
+          ...this.#filmCard.userDetails,
+          alreadyWatched: !this.#filmCard.userDetails.alreadyWatched
+        }
+      }
+    );
   };
 
   #handleFavoriteClick = () => {
-    this.#handleFilmCardChange({...this.#filmCard, userDetails: {...this.#filmCard.userDetails, favorite: !this.#filmCard.userDetails.favorite}});
+    this.#handleFilmCardChange(
+      UserAction.UPDATE_FILM_CARD,
+      UpdateType.MINOR,
+      {
+        ...this.#filmCard,
+        userDetails: {
+          ...this.#filmCard.userDetails,
+          favorite: !this.#filmCard.userDetails.favorite
+        }
+      }
+    );
   };
 
   #handleFilmCardClick = () => {
-    this.#handleModeChange();
-    this.#popupPresenter.init({
-      filmCard: this.#filmCard,
-      commentsModel: this.#commentsModel,
-      onPopupRemove: this.#resetMode,
-      mode: this.#mode});
-    this.#mode = Mode.POPUP;
+    this.#handleModeChange(this.#filmCard);
   };
 }

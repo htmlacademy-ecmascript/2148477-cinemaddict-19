@@ -4,18 +4,15 @@ import FilmContainerView from '../view/film-container-view.js';
 
 import FilmCardPresenter from './film-card-presenter.js';
 
-import { render } from '../framework/render.js';
+import { render, remove } from '../framework/render.js';
+import { Mode } from '../util/const.js';
 
 export default class FilmExtraPresenter {
-  #page = document.querySelector('.page');
-
   #filmExtraListComponent = new FilmListView();
   #filmExtraHeaderComponent = new FilmListHeaderView();
   #filmExtraContainerComponent = new FilmContainerView();
 
   #container = null;
-  #filmsModel = null;
-  #commentsModel = null;
 
   #filmExtraHeader = '';
   #filmExtraCardCount = 0;
@@ -25,35 +22,46 @@ export default class FilmExtraPresenter {
   #filmExtraCards = [];
 
   #filmCardPresenterList = null;
+  #popupPresenter = null;
+  #filmsModel = null;
 
   #handleFilmCardChange = null;
 
-  constructor({container, filmsModel, commentsModel, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList}) {
+  constructor({container, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList, onFilmCardChange, popupPresenter, mode, filmsModel}) {
     this.#container = container;
-    this.#filmsModel = filmsModel;
-    this.#commentsModel = commentsModel;
     this.#filmExtraCardCount = filmExtraCardCount;
     this.#filmExtraHeader = filmExtraHeader;
     this.#filmExtraSortCB = filmExtraSortCB;
     this.#filmCardPresenterList = filmCardPresenterList;
+    this.#handleFilmCardChange = onFilmCardChange;
+    this.#popupPresenter = popupPresenter;
+    this.mode = mode;
+    this.#filmsModel = filmsModel;
+
+    this.#filmsModel.addObserver(this.#handleModelEvent);
   }
 
-  init({onFilmCardChange}) {
-    this.#filmCards = [...this.#filmsModel.films];
-    this.#handleFilmCardChange = onFilmCardChange;
+  init({filmCards}) {
+    this.#filmCards = filmCards;
 
     this.#renderFilmExtra();
   }
 
-  #handleModeChange = () => {
-    this.#filmCardPresenterList.forEach(
-      (presentersArr) => presentersArr.forEach(
-        (presenter) => presenter.resetView()
-      )
-    );
+  #handleModelEvent = () => {
+    remove(this.#filmExtraListComponent);
+    remove(this.#filmExtraContainerComponent);
+    this.#filmExtraListComponent = new FilmListView();
+    this.#filmExtraContainerComponent = new FilmContainerView();
+    this.init({filmCards: this.#filmsModel.films});
   };
 
-  #renderFilmCard(filmCard, commentsModel) {
+  #handleModeChange = (filmCard) => {
+    this.#popupPresenter.removePopup();
+    this.#popupPresenter.init(filmCard);
+    this.mode(Mode.POPUP);
+  };
+
+  #renderFilmCard(filmCard) {
     const filmCardPresenter = new FilmCardPresenter({
       onFilmCardChange: this.#handleFilmCardChange,
       filmCardContainer: this.#filmExtraContainerComponent.element,
@@ -61,16 +69,14 @@ export default class FilmExtraPresenter {
     });
 
     filmCardPresenter.init({
-      popupContainer: this.#page,
       filmCard,
-      commentsModel,
     });
 
-    if ( this.#filmCardPresenterList.has(filmCard.newId) ) {
-      const updatedSameCardPresenters = this.#filmCardPresenterList.get(filmCard.newId);
+    if ( this.#filmCardPresenterList.has(filmCard.id) ) {
+      const updatedSameCardPresenters = this.#filmCardPresenterList.get(filmCard.id);
       updatedSameCardPresenters.push(filmCardPresenter);
       this.#filmCardPresenterList.set(
-        filmCard.newId,
+        filmCard.id,
         updatedSameCardPresenters,
       );
       return;
@@ -78,14 +84,18 @@ export default class FilmExtraPresenter {
 
     const sameCardPresenters = [];
     sameCardPresenters.push(filmCardPresenter);
-    this.#filmCardPresenterList.set(filmCard.newId, sameCardPresenters);
+    this.#filmCardPresenterList.set(filmCard.id, sameCardPresenters);
 
   }
 
   #renderFilmCards(from, to) {
-    this.#filmCards
+    this.#filmExtraCards
       .slice(from, to)
-      .forEach((filmCard) => this.#renderFilmCard(filmCard, this.#commentsModel));
+      .forEach((filmCard) => this.#renderFilmCard(filmCard));
+  }
+
+  #renderFilmList() {
+    this.#renderFilmCards(0, Math.min(this.#filmExtraCards.length, this.#filmExtraCardCount));
   }
 
   #renderFilmContainer() {
@@ -99,28 +109,13 @@ export default class FilmExtraPresenter {
     render(this.#filmExtraContainerComponent, this.#filmExtraListComponent.element);
   }
 
-  #renderFilmList() {
-    this.#renderFilmCards(0, Math.min(this.#filmExtraCards.length, this.#filmExtraCardCount));
-  }
-
-  #clearFilmList() {
-    this.#filmCardPresenterList.forEach(
-      (presentersArr) => presentersArr.forEach(
-        (presenter) => presenter.destroy()
-      )
-    );
-
-    this.#filmCardPresenterList.clear();
-  }
-
-
   #renderFilmExtra() {
     if (!this.#container.element.contains(this.#filmExtraListComponent.element)) {
       this.#renderFilmContainer();
     }
 
     if (this.#filmCards.length > 0) {
-      this.#filmExtraCards = this.#filmCards.sort(this.#filmExtraSortCB);
+      this.#filmExtraCards = [...this.#filmCards].sort(this.#filmExtraSortCB);
 
       this.#renderFilmList();
     }
