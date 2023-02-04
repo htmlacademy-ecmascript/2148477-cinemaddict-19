@@ -83,7 +83,6 @@ export default class PopupCommentNewView extends AbstractStatefulView {
   };
 
   #formSubmitHandler = (evt) => {
-    // evt.preventDefault();
     this.#keysPressed[evt.key] = true;
     if (this.#keysPressed['Control'] && evt.key === 'Enter') {
       if (this._state.comment !== '' && this._state.emotion !== '') {
@@ -97,10 +96,5 @@ export default class PopupCommentNewView extends AbstractStatefulView {
     this.updateElement({
       emotion: evt.target.dataset.emoji,
     });
-  };
-
-  #formSubmitHandler = (evt) => {
-    evt.preventDefault();
-    this.#handleFormSubmit(this._state);
   };
 }
