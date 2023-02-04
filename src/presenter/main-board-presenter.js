@@ -113,7 +113,6 @@ export default class MainBoardPresenter {
       case SortType.RATING:
         return filteredFilmCards.sort(sortMainRating);
     }
-    
     return filteredFilmCards;
   }
 
