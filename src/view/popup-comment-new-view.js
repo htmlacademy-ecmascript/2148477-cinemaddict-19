@@ -51,7 +51,7 @@ export default class PopupCommentNewView extends AbstractStatefulView {
 
   constructor({comment = NEW_COMMENT, onFormSubmit}) {
     super();
-    this._setState(PopupCommentNewView.parseCommentToState(comment));
+    this._setState({...comment});
     this.#handleFormSubmit = onFormSubmit;
 
     this._restoreHandlers();
@@ -100,7 +100,7 @@ export default class PopupCommentNewView extends AbstractStatefulView {
       emotion: evt.target.dataset.emoji,
     });
   };
-
+  
   static parseCommentToState(comment) {
     return {...comment};
   }

@@ -74,6 +74,7 @@ export default class MainBoardPresenter {
       commentsModel: this.#commentsModel,
       filmsModel: this.#filmsModel,
     });
+
     this.#mostCommentedPresenter = new FilmExtraPresenter({
       container: this.#filmWrapperComponent,
       filmExtraCardCount: FILM_EXTRA_CARD_COUNT.mostCommented,
@@ -91,6 +92,7 @@ export default class MainBoardPresenter {
       filmsModel: this.#filmsModel,
       filterModel: this.#filterModel,
     });
+
     this.#headerPresenter = new HeaderPresenter();
 
     this.#filmsModel.addObserver(this.#handleModelEvent);
