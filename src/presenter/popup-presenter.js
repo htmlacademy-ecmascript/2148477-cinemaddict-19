@@ -8,13 +8,13 @@ import PopupCommentView from '../view/popup-comment-view.js';
 import { render, remove } from '../framework/render.js';
 import { Mode } from '../util/const.js';
 import { UserAction, UpdateType } from '../util/const.js';
+// import { nanoid } from 'nanoid';
+import { setCommentDate } from '../util/date-time.js';
 
 export default class PopupPresenter {
   #popupComponent = new PopupView();
   #popupCommentContainerComponent = new PopupCommentContainerView();
   #popupCommentListComponent = new PopupCommentListView();
-  #popupCommentNewComponent = new PopupCommentNewView({onFormSubmit: null});
-
 
   #container = null;
   #filmCard = null;
@@ -27,6 +27,7 @@ export default class PopupPresenter {
 
   #popupFilmDetailsComponent = null;
   #popupCommentHeaderComponent = null;
+  #popupCommentNewComponent = null;
 
   #comments = [];
   #commentViews = [];
@@ -38,6 +39,8 @@ export default class PopupPresenter {
     this.#commentsModel = commentsModel;
     this.#handlePopupRemoval = onPopupRemove;
     this.#mode = mode;
+
+    this.#popupCommentNewComponent = new PopupCommentNewView({onFormSubmit: this.#handleFormSubmit});
 
     this.#filmsModel.addObserver(this.#handleModelEvent);
   }
@@ -73,7 +76,7 @@ export default class PopupPresenter {
 
     render(this.#popupCommentListComponent, this.#popupCommentContainerComponent.element.firstElementChild);
     for (const comment of this.#comments) {
-      const commentView = new PopupCommentView({comment});
+      const commentView = new PopupCommentView({comment, onDeleteClick: this.#handleDeleteClick});
       render(commentView, this.#popupCommentListComponent.element);
       this.#commentViews.push(commentView);
     }
@@ -87,10 +90,56 @@ export default class PopupPresenter {
     }
   }
 
+  #handleFormSubmit = (comment) => {
+    const newCommentId = Math.round( Math.random() * 1000 );
+
+    this.#handleViewAction(
+      UserAction.ADD_COMMENT,
+      UpdateType.PATCH,
+      {
+        ...comment,
+        id: newCommentId,
+        author: 'anonymous',
+        date: setCommentDate(),
+      }
+    );
+
+    this.#handleViewAction(
+      UserAction.UPDATE_FILM_CARD,
+      UpdateType.PATCH,
+      {
+        ...this.#filmCard,
+        comments: [...this.#filmCard.comments, newCommentId],
+      }
+    );
+  };
+
+  #handleDeleteClick = (comment) => {
+    this.#handleViewAction(
+      UserAction.DELETE_COMMENT,
+      UpdateType.PATCH,
+      comment
+    );
+
+    const index = this.#comments.findIndex((comm) => comm.id === comment.id);
+
+    this.#handleViewAction(
+      UserAction.UPDATE_FILM_CARD,
+      UpdateType.PATCH,
+      {
+        ...this.#filmCard,
+        comments: [
+          ...this.#filmCard.comments.slice(0, index),
+          ...this.#filmCard.comments.slice(index + 1),
+        ]
+      }
+    );
+  };
+
   #handleModelEvent = () => {
     if (this.#mode() === Mode.POPUP) {
       this.earsePopup();
-      this.init(this.#filmsModel.films.find( (element) => element.id === this.#filmCard.id));
+      this.init( this.#filmsModel.films.find( (element) => element.id === this.#filmCard.id ) );
     }
   };
 

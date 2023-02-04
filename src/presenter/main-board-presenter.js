@@ -39,6 +39,7 @@ export default class MainBoardPresenter {
 
   #container = null;
   #filmsModel = null;
+  #commentsModel = null;
   #filterModel = null;
 
   #renderedFilmCardsCount = FILM_CARDS_COUNT_PER_STEP;
@@ -51,11 +52,12 @@ export default class MainBoardPresenter {
   constructor({container, filmsModel, commentsModel, filterModel}) {
     this.#container = container;
     this.#filmsModel = filmsModel;
+    this.#commentsModel = commentsModel;
     this.#filterModel = filterModel;
     this.#popupPresenter = new PopupPresenter({
       container: this.#page,
       filmsModel,
-      commentsModel,
+      commentsModel: this.#commentsModel,
       onViewAction: this.#handleViewAction,
       onPopupRemove: this.#resetMode,
       mode: this.#getMode,
@@ -69,6 +71,8 @@ export default class MainBoardPresenter {
       onFilmCardChange: this.#handleViewAction,
       popupPresenter: this.#popupPresenter,
       mode: this.#setMode,
+      commentsModel: this.#commentsModel,
+      filmsModel: this.#filmsModel,
     });
     this.#mostCommentedPresenter = new FilmExtraPresenter({
       container: this.#filmWrapperComponent,
@@ -79,6 +83,8 @@ export default class MainBoardPresenter {
       onFilmCardChange: this.#handleViewAction,
       popupPresenter: this.#popupPresenter,
       mode: this.#setMode,
+      commentsModel: this.#commentsModel,
+      filmsModel: this.#filmsModel,
     });
     this.#filterBarPresenter = new FilterBarPresenter({
       container: this.#container,
@@ -147,12 +153,10 @@ export default class MainBoardPresenter {
         this.#filmsModel.updateFilm(updateType, update);
         break;
       case UserAction.ADD_COMMENT:
-        this.#filmsModel.updateFilm(updateType, update);
-        // this.#commentsModel - добавить изменение второй модели
+        this.#commentsModel.addComment(updateType, update);
         break;
       case UserAction.DELETE_COMMENT:
-        this.#filmsModel.updateFilm(updateType, update);
-        // this.#commentsModel - добавить изменение второй модели
+        this.#commentsModel.deleteComment(updateType, update);
         break;
     }
   };
@@ -161,13 +165,19 @@ export default class MainBoardPresenter {
     switch (updateType) {
       case UpdateType.PATCH:
         // - обновить карточку и экстра презентер при необходимости
+        this.#filmCardPresenterList.get(data.id).forEach(
+          (presenter) => {
+            presenter.init({filmCard: data});
+          }
+        );
         break;
+
       case UpdateType.MINOR:
         // - обновить карточку, хедэр и филтер-бар (филтер-бар сам обновится)
         this.#renderHeader();
 
         if (this.#filterModel.filter !== FilterType.ALL) {
-          this.#clearMainBoard({resetRenderedFilmCardsCount: (this.films.length < 5)});
+          this.#clearMainBoard({ resetRenderedFilmCardsCount: (this.films.length < 5) });
           this.#renderMainBoard();
           break;
         }
@@ -178,6 +188,7 @@ export default class MainBoardPresenter {
           }
         );
         break;
+
       case UpdateType.MAJOR:
         // - обновить всю доску (например, при переключении фильтра)
         this.#clearMainBoard({resetRenderedFilmCardsCount: true});

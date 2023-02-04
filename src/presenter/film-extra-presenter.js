@@ -4,7 +4,7 @@ import FilmContainerView from '../view/film-container-view.js';
 
 import FilmCardPresenter from './film-card-presenter.js';
 
-import { render } from '../framework/render.js';
+import { render, remove } from '../framework/render.js';
 import { Mode } from '../util/const.js';
 
 export default class FilmExtraPresenter {
@@ -23,10 +23,12 @@ export default class FilmExtraPresenter {
 
   #filmCardPresenterList = null;
   #popupPresenter = null;
+  #commentsModel = null;
+  #filmsModel = null;
 
   #handleFilmCardChange = null;
 
-  constructor({container, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList, onFilmCardChange, popupPresenter, mode}) {
+  constructor({container, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList, onFilmCardChange, popupPresenter, mode, commentsModel, filmsModel}) {
     this.#container = container;
     this.#filmExtraCardCount = filmExtraCardCount;
     this.#filmExtraHeader = filmExtraHeader;
@@ -35,6 +37,10 @@ export default class FilmExtraPresenter {
     this.#handleFilmCardChange = onFilmCardChange;
     this.#popupPresenter = popupPresenter;
     this.mode = mode;
+    this.#commentsModel = commentsModel;
+    this.#filmsModel = filmsModel;
+
+    this.#commentsModel.addObserver(this.#handleModelEvent);
   }
 
   init({filmCards}) {
@@ -42,6 +48,14 @@ export default class FilmExtraPresenter {
 
     this.#renderFilmExtra();
   }
+
+  #handleModelEvent = () => {
+    remove(this.#filmExtraListComponent);
+    remove(this.#filmExtraContainerComponent);
+    this.#filmExtraListComponent = new FilmListView();
+    this.#filmExtraContainerComponent = new FilmContainerView();
+    this.init({filmCards: this.#filmsModel.films});
+  };
 
   #handleModeChange = (filmCard) => {
     this.#popupPresenter.removePopup();
@@ -77,9 +91,13 @@ export default class FilmExtraPresenter {
   }
 
   #renderFilmCards(from, to) {
-    this.#filmCards
+    this.#filmExtraCards
       .slice(from, to)
       .forEach((filmCard) => this.#renderFilmCard(filmCard));
+  }
+
+  #renderFilmList() {
+    this.#renderFilmCards(0, Math.min(this.#filmExtraCards.length, this.#filmExtraCardCount));
   }
 
   #renderFilmContainer() {
@@ -93,17 +111,13 @@ export default class FilmExtraPresenter {
     render(this.#filmExtraContainerComponent, this.#filmExtraListComponent.element);
   }
 
-  #renderFilmList() {
-    this.#renderFilmCards(0, Math.min(this.#filmExtraCards.length, this.#filmExtraCardCount));
-  }
-
   #renderFilmExtra() {
     if (!this.#container.element.contains(this.#filmExtraListComponent.element)) {
       this.#renderFilmContainer();
     }
 
     if (this.#filmCards.length > 0) {
-      this.#filmExtraCards = this.#filmCards.sort(this.#filmExtraSortCB);
+      this.#filmExtraCards = [...this.#filmCards].sort(this.#filmExtraSortCB);
 
       this.#renderFilmList();
     }
