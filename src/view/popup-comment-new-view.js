@@ -100,7 +100,7 @@ export default class PopupCommentNewView extends AbstractStatefulView {
       emotion: evt.target.dataset.emoji,
     });
   };
-  
+
   static parseCommentToState(comment) {
     return {...comment};
   }
