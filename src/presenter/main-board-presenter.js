@@ -71,7 +71,6 @@ export default class MainBoardPresenter {
       onFilmCardChange: this.#handleViewAction,
       popupPresenter: this.#popupPresenter,
       mode: this.#setMode,
-      commentsModel: this.#commentsModel,
       filmsModel: this.#filmsModel,
     });
 
@@ -84,7 +83,6 @@ export default class MainBoardPresenter {
       onFilmCardChange: this.#handleViewAction,
       popupPresenter: this.#popupPresenter,
       mode: this.#setMode,
-      commentsModel: this.#commentsModel,
       filmsModel: this.#filmsModel,
     });
     this.#filterBarPresenter = new FilterBarPresenter({
@@ -167,7 +165,7 @@ export default class MainBoardPresenter {
     switch (updateType) {
       case UpdateType.PATCH:
         // - обновить карточку и экстра презентер при необходимости
-        this.#filmCardPresenterList.get(data.id).forEach(
+        this.#filmCardPresenterList.get(data.id)?.forEach(
           (presenter) => {
             presenter.init({filmCard: data});
           }
@@ -328,8 +326,8 @@ export default class MainBoardPresenter {
   }
 
   #renderExtra() {
-    this.#topRatedPresenter.init({filmCards: [...this.#filmsModel.films]});
-    this.#mostCommentedPresenter.init({filmCards: [...this.#filmsModel.films]});
+    this.#topRatedPresenter.init({filmCards: this.#filmsModel.films});
+    this.#mostCommentedPresenter.init({filmCards: this.#filmsModel.films});
   }
 
   #renderHeader() {
