@@ -51,7 +51,7 @@ export default class PopupCommentNewView extends AbstractStatefulView {
 
   constructor({comment = NEW_COMMENT, onFormSubmit}) {
     super();
-    this._setState(PopupCommentNewView.parseCommentToState(comment));
+    this._setState({...comment});
     this.#handleFormSubmit = onFormSubmit;
 
     this._restoreHandlers();
@@ -62,9 +62,7 @@ export default class PopupCommentNewView extends AbstractStatefulView {
   }
 
   reset() {
-    this.updateElement(
-      PopupCommentNewView.parseCommentToState(NEW_COMMENT),
-    );
+    this.updateElement({...NEW_COMMENT});
   }
 
   _restoreHandlers() {
@@ -101,13 +99,8 @@ export default class PopupCommentNewView extends AbstractStatefulView {
     });
   };
 
-  static parseCommentToState(comment) {
-    return {...comment};
-  }
-
-  static parseStateToComment(state) {
-    const comment = {...state};
-
-    return comment;
-  }
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit(this._state);
+  };
 }

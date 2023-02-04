@@ -30,6 +30,7 @@ export default class FilmExtraPresenter {
 
   constructor({container, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList, onFilmCardChange, popupPresenter, mode, commentsModel, filmsModel}) {
     this.#container = container;
+
     this.#filmExtraCardCount = filmExtraCardCount;
     this.#filmExtraHeader = filmExtraHeader;
     this.#filmExtraSortCB = filmExtraSortCB;

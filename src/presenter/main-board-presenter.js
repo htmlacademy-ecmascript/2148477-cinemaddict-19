@@ -53,10 +53,12 @@ export default class MainBoardPresenter {
     this.#container = container;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
+
     this.#filterModel = filterModel;
     this.#popupPresenter = new PopupPresenter({
       container: this.#page,
       filmsModel,
+
       commentsModel: this.#commentsModel,
       onViewAction: this.#handleViewAction,
       onPopupRemove: this.#resetMode,
@@ -74,8 +76,10 @@ export default class MainBoardPresenter {
       commentsModel: this.#commentsModel,
       filmsModel: this.#filmsModel,
     });
+
     this.#mostCommentedPresenter = new FilmExtraPresenter({
       container: this.#filmWrapperComponent,
+
       filmExtraCardCount: FILM_EXTRA_CARD_COUNT.mostCommented,
       filmExtraHeader: FILM_EXTRA_HEADER.mostCommented,
       filmExtraSortCB: sortMostCommented,
@@ -91,6 +95,7 @@ export default class MainBoardPresenter {
       filmsModel: this.#filmsModel,
       filterModel: this.#filterModel,
     });
+
     this.#headerPresenter = new HeaderPresenter();
 
     this.#filmsModel.addObserver(this.#handleModelEvent);
@@ -108,7 +113,7 @@ export default class MainBoardPresenter {
       case SortType.RATING:
         return filteredFilmCards.sort(sortMainRating);
     }
-
+    
     return filteredFilmCards;
   }
 
@@ -227,6 +232,7 @@ export default class MainBoardPresenter {
   #renderFilmCard(filmCard) {
     const filmCardPresenter = new FilmCardPresenter({
       onFilmCardChange: this.#handleViewAction,
+
       filmCardContainer: this.#filmContainerComponent.element,
       onModeChange: this.#handleModeChange,
       isMainBoard: true,
