@@ -4,7 +4,21 @@ import { getRandomFilmData } from '../mock/films-data.js';
 const FILMS_COUNT = 36;
 
 export default class FilmsModel extends Observable {
+  #filmsApiService = null;
   #films = Array.from({length: FILMS_COUNT}, getRandomFilmData);
+
+  constructor({filmsApiService}) {
+    super();
+    this.#filmsApiService = filmsApiService;
+
+    this.#filmsApiService.films.then((tasks) => {
+      console.log(tasks);
+      // Есть проблема: cтруктура объекта похожа, но некоторые ключи называются иначе,
+      // а ещё на сервере используется snake_case, а у нас camelCase.
+      // Можно, конечно, переписать часть нашего клиентского приложения, но зачем?
+      // Есть вариант получше - паттерн "Адаптер"
+    });
+  }
 
   get films() {
     return this.#films;
