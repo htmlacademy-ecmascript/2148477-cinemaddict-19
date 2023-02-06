@@ -24,10 +24,11 @@ export default class FilmExtraPresenter {
   #filmCardPresenterList = null;
   #popupPresenter = null;
   #filmsModel = null;
+  #commentsModel = null;
 
   #handleFilmCardChange = null;
 
-  constructor({container, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList, onFilmCardChange, popupPresenter, mode, filmsModel}) {
+  constructor({container, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList, onFilmCardChange, popupPresenter, mode, filmsModel, commentsModel}) {
     this.#container = container;
     this.#filmExtraCardCount = filmExtraCardCount;
     this.#filmExtraHeader = filmExtraHeader;
@@ -37,6 +38,7 @@ export default class FilmExtraPresenter {
     this.#popupPresenter = popupPresenter;
     this.mode = mode;
     this.#filmsModel = filmsModel;
+    this.#commentsModel = commentsModel;
 
     this.#filmsModel.addObserver(this.#handleModelEvent);
   }
@@ -60,6 +62,7 @@ export default class FilmExtraPresenter {
   #handleModeChange = (filmCard) => {
     this.#popupPresenter.removePopup();
     this.#popupPresenter.init(filmCard);
+    this.#commentsModel.init(filmCard);
     this.mode(Mode.POPUP);
   };
 

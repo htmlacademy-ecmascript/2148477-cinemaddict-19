@@ -78,6 +78,7 @@ export default class MainBoardPresenter {
       popupPresenter: this.#popupPresenter,
       mode: this.#setMode,
       filmsModel: this.#filmsModel,
+      commentsModel: this.#commentsModel,
     });
     this.#mostCommentedPresenter = new FilmExtraPresenter({
       container: this.#filmWrapperComponent,
@@ -89,6 +90,7 @@ export default class MainBoardPresenter {
       popupPresenter: this.#popupPresenter,
       mode: this.#setMode,
       filmsModel: this.#filmsModel,
+      commentsModel: this.#commentsModel,
     });
     this.#filterBarPresenter = new FilterBarPresenter({
       container: this.#container,
@@ -151,6 +153,7 @@ export default class MainBoardPresenter {
   #handleModeChange = (filmCard) => {
     this.#popupPresenter.removePopup();
     this.#popupPresenter.init(filmCard);
+    this.#commentsModel.init(filmCard);
     this.mode = Mode.POPUP;
   };
 
@@ -201,6 +204,7 @@ export default class MainBoardPresenter {
         this.#clearMainBoard({resetRenderedFilmCardsCount: true});
         this.#renderMainBoard();
         break;
+
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
