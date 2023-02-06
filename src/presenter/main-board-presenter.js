@@ -1,5 +1,6 @@
 import SortBarView from '../view/sort-bar-view.js';
 import NoFilmCardsView from '../view/no-film-cards-view.js';
+import LoadingView from '../view/loading-view.js';
 import FilmWrapperView from '../view/film-wrapper-view.js';
 import FilmListView from '../view/film-list-view.js';
 import FilmListHeaderView from '../view/film-list-header-view.js';
@@ -11,6 +12,7 @@ import FilterBarPresenter from './filter-bar-presenter.js';
 import FilmCardPresenter from './film-card-presenter.js';
 import FilmExtraPresenter from './film-extra-presenter.js';
 import HeaderPresenter from './header-presenter.js';
+import FooterStatisticPresenter from './footer-statistic-presenter.js';
 
 import { remove, render, replace, RenderPosition } from '../framework/render.js';
 import { sortMainDate, sortMainRating, sortTopRated, sortMostCommented } from '../util/sort-film-cards.js';
@@ -30,12 +32,14 @@ export default class MainBoardPresenter {
   #showMoreButtonComponent = null;
   #sortBarComponent = null;
   #noFilmCardsComponent = null;
+  #loadingComponent = new LoadingView();
 
   #popupPresenter = null;
   #filterBarPresenter = null;
   #topRatedPresenter = null;
   #mostCommentedPresenter = null;
   #headerPresenter = null;
+  #footerStatisticPresenter = null;
 
   #container = null;
   #filmsModel = null;
@@ -48,6 +52,8 @@ export default class MainBoardPresenter {
   #currentFilterType = FilterType.ALL;
 
   mode = Mode.DEFAULT;
+
+  #isLoading = true;
 
   constructor({container, filmsModel, commentsModel, filterModel}) {
     this.#container = container;
@@ -72,8 +78,8 @@ export default class MainBoardPresenter {
       popupPresenter: this.#popupPresenter,
       mode: this.#setMode,
       filmsModel: this.#filmsModel,
+      commentsModel: this.#commentsModel,
     });
-
     this.#mostCommentedPresenter = new FilmExtraPresenter({
       container: this.#filmWrapperComponent,
       filmExtraCardCount: FILM_EXTRA_CARD_COUNT.mostCommented,
@@ -84,11 +90,15 @@ export default class MainBoardPresenter {
       popupPresenter: this.#popupPresenter,
       mode: this.#setMode,
       filmsModel: this.#filmsModel,
+      commentsModel: this.#commentsModel,
     });
     this.#filterBarPresenter = new FilterBarPresenter({
       container: this.#container,
       filmsModel: this.#filmsModel,
       filterModel: this.#filterModel,
+    });
+    this.#footerStatisticPresenter = new FooterStatisticPresenter({
+      container: document.querySelector('.footer__statistics'),
     });
 
     this.#headerPresenter = new HeaderPresenter();
@@ -114,7 +124,6 @@ export default class MainBoardPresenter {
 
   init() {
     this.#renderMainBoard();
-    this.#renderHeader();
   }
 
   #handleShowMoreButtonClick = () => {
@@ -144,6 +153,7 @@ export default class MainBoardPresenter {
   #handleModeChange = (filmCard) => {
     this.#popupPresenter.removePopup();
     this.#popupPresenter.init(filmCard);
+    this.#commentsModel.init(filmCard);
     this.mode = Mode.POPUP;
   };
 
@@ -193,6 +203,14 @@ export default class MainBoardPresenter {
         // - обновить всю доску (например, при переключении фильтра)
         this.#clearMainBoard({resetRenderedFilmCardsCount: true});
         this.#renderMainBoard();
+        break;
+
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderHeader();
+        this.#renderMainBoard();
+        this.#footerStatisticPresenter.init(this.#filmsModel);
         break;
     }
   };
@@ -259,6 +277,10 @@ export default class MainBoardPresenter {
     render(this.#noFilmCardsComponent, this.#filmListComponent.element, RenderPosition.AFTERBEGIN);
   }
 
+  #renderLoading() {
+    render(this.#loadingComponent, this.#filmListComponent.element, RenderPosition.AFTERBEGIN);
+  }
+
   #renderShowMoreButton() {
     this.#showMoreButtonComponent = new ShowMoreButtonView({onClick: this.#handleShowMoreButtonClick});
     render(this.#showMoreButtonComponent, this.#filmListComponent.element);
@@ -275,6 +297,7 @@ export default class MainBoardPresenter {
     this.#filmCardPresenterList.clear();
 
     remove(this.#showMoreButtonComponent);
+    remove(this.#loadingComponent);
 
     if (this.#noFilmCardsComponent) {
       remove(this.#noFilmCardsComponent);
@@ -301,6 +324,11 @@ export default class MainBoardPresenter {
 
     if (!this.#filmWrapperComponent.element.contains(this.#filmListComponent.element)) {
       render(this.#filmListComponent, this.#filmWrapperComponent.element);
+    }
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
     }
 
     const filmCards = this.films;

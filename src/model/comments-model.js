@@ -1,17 +1,34 @@
 import Observable from '../framework/observable.js';
-import { COMMENTS } from '../mock/comments-data.js';
+import { UpdateType } from '../util/const.js';
 
 export default class CommentsModel extends Observable {
-  #comments = COMMENTS;
+  #commentsApiService = null;
+  #comments = [];
+
+  constructor({commentsApiService}) {
+    super();
+    this.#commentsApiService = commentsApiService;
+  }
 
   get comments() {
     return this.#comments;
   }
 
+  async init(film) {
+    try {
+      const comments = await this.#commentsApiService.getComments(film.id);
+      this.#comments = comments.map(this.#adaptToClient);
+    } catch(err) {
+      this.#comments = [];
+    }
+
+    this._notify(UpdateType.INIT);
+  }
+
   addComment(updateType, update) {
     this.#comments.push(update);
 
-    this._notify(updateType, update);
+    // this._notify(updateType, update);
   }
 
   deleteComment(updateType, update) {
@@ -26,6 +43,14 @@ export default class CommentsModel extends Observable {
       ...this.#comments.slice(index + 1),
     ];
 
-    this._notify(updateType, update);
+    // this._notify(updateType, update);
+  }
+
+  #adaptToClient(comment) {
+    const adaptedComment = {
+      ...comment,
+      date: comment.date !== null ? new Date(comment.date) : null,
+    };
+    return adaptedComment;
   }
 }

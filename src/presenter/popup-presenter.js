@@ -5,10 +5,11 @@ import PopupCommentHeaderView from '../view/popup-comment-header-view.js';
 import PopupCommentListView from '../view/popup-comment-list-view.js';
 import PopupCommentNewView from '../view/popup-comment-new-view.js';
 import PopupCommentView from '../view/popup-comment-view.js';
+import PopupCommentLoadingView from '../view/popup-comment-loading-view.js';
+
 import { render, remove } from '../framework/render.js';
 import { Mode } from '../util/const.js';
 import { UserAction, UpdateType } from '../util/const.js';
-// import { nanoid } from 'nanoid';
 import { setCommentDate } from '../util/date-time.js';
 
 export default class PopupPresenter {
@@ -28,9 +29,12 @@ export default class PopupPresenter {
   #popupFilmDetailsComponent = null;
   #popupCommentHeaderComponent = null;
   #popupCommentNewComponent = null;
+  #popupCommentLoadingComponent = null;
 
   #comments = [];
   #commentViews = [];
+
+  #isLoading = true;
 
   constructor({filmsModel, commentsModel, container, onViewAction, onPopupRemove, mode}) {
     this.#container = container;
@@ -42,6 +46,7 @@ export default class PopupPresenter {
 
     this.#popupCommentNewComponent = new PopupCommentNewView({onFormSubmit: this.#handleFormSubmit});
 
+    this.#commentsModel.addObserver(this.#handleCommentsModelEvent);
     this.#filmsModel.addObserver(this.#handleModelEvent);
   }
 
@@ -63,10 +68,6 @@ export default class PopupPresenter {
     this.#container.classList.add('hide-overflow');
     this.#container.addEventListener('keydown', this.#escKeyDownHandler);
 
-    this.#comments = this.#commentsModel.comments.filter(
-      (comment) => this.#filmCard.comments.includes(+comment.id)
-    );
-
     render(this.#popupComponent, this.#container);
 
     render(this.#popupFilmDetailsComponent, this.#popupComponent.element.firstElementChild);
@@ -74,11 +75,19 @@ export default class PopupPresenter {
     render(this.#popupCommentContainerComponent, this.#popupComponent.element.firstElementChild);
     render(this.#popupCommentHeaderComponent, this.#popupCommentContainerComponent.element.firstElementChild);
 
-    render(this.#popupCommentListComponent, this.#popupCommentContainerComponent.element.firstElementChild);
-    for (const comment of this.#comments) {
-      const commentView = new PopupCommentView({comment, onDeleteClick: this.#handleDeleteClick});
-      render(commentView, this.#popupCommentListComponent.element);
-      this.#commentViews.push(commentView);
+    if (this.#isLoading) {
+      this.#renderLoading();
+    } else {
+      this.#comments = this.#commentsModel.comments.filter(
+        (comment) => this.#filmCard.comments.includes(comment.id)
+      );
+
+      render(this.#popupCommentListComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+      for (const comment of this.#comments) {
+        const commentView = new PopupCommentView({comment, onDeleteClick: this.#handleDeleteClick});
+        render(commentView, this.#popupCommentListComponent.element);
+        this.#commentViews.push(commentView);
+      }
     }
 
     render(this.#popupCommentNewComponent, this.#popupCommentContainerComponent.element.firstElementChild);
@@ -88,6 +97,11 @@ export default class PopupPresenter {
     if (this.#mode() === Mode.POPUP) {
       this.#popupComponent.restoreScroll();
     }
+  }
+
+  #renderLoading() {
+    this.#popupCommentLoadingComponent = new PopupCommentLoadingView();
+    render(this.#popupCommentLoadingComponent, this.#popupCommentContainerComponent.element.firstElementChild);
   }
 
   #handleFormSubmit = (comment) => {
@@ -136,6 +150,16 @@ export default class PopupPresenter {
     );
   };
 
+  #handleCommentsModelEvent = (updateType) => {
+    if (updateType === UpdateType.INIT) {
+      this.#isLoading = false;
+      remove(this.#popupCommentLoadingComponent);
+    }
+
+    this.earsePopup();
+    this.init( this.#filmsModel.films.find( (element) => element.id === this.#filmCard.id ) );
+  };
+
   #handleModelEvent = () => {
     if (this.#mode() === Mode.POPUP) {
       this.earsePopup();
@@ -169,6 +193,7 @@ export default class PopupPresenter {
     remove(this.#popupFilmDetailsComponent);
 
     this.#handlePopupRemoval();
+    this.#isLoading = true;
   };
 
   #escKeyDownHandler = (evt) => {

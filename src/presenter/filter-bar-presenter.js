@@ -65,8 +65,10 @@ export default class FilterBarPresenter {
     remove(prevFilterComponent);
   }
 
-  #handleModelEvent = () => {
-    this.init();
+  #handleModelEvent = (updateType) => {
+    if (updateType !== UpdateType.INIT) {
+      this.init();
+    }
   };
 
   #handleFilterTypeChange = (filterType) => {

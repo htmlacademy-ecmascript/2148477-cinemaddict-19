@@ -5,7 +5,7 @@ import FilmContainerView from '../view/film-container-view.js';
 import FilmCardPresenter from './film-card-presenter.js';
 
 import { render, remove } from '../framework/render.js';
-import { Mode } from '../util/const.js';
+import { Mode, UpdateType } from '../util/const.js';
 
 export default class FilmExtraPresenter {
   #filmExtraListComponent = new FilmListView();
@@ -24,10 +24,11 @@ export default class FilmExtraPresenter {
   #filmCardPresenterList = null;
   #popupPresenter = null;
   #filmsModel = null;
+  #commentsModel = null;
 
   #handleFilmCardChange = null;
 
-  constructor({container, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList, onFilmCardChange, popupPresenter, mode, filmsModel}) {
+  constructor({container, filmExtraCardCount, filmExtraHeader, filmExtraSortCB, filmCardPresenterList, onFilmCardChange, popupPresenter, mode, filmsModel, commentsModel}) {
     this.#container = container;
     this.#filmExtraCardCount = filmExtraCardCount;
     this.#filmExtraHeader = filmExtraHeader;
@@ -37,6 +38,7 @@ export default class FilmExtraPresenter {
     this.#popupPresenter = popupPresenter;
     this.mode = mode;
     this.#filmsModel = filmsModel;
+    this.#commentsModel = commentsModel;
 
     this.#filmsModel.addObserver(this.#handleModelEvent);
   }
@@ -47,17 +49,20 @@ export default class FilmExtraPresenter {
     this.#renderFilmExtra();
   }
 
-  #handleModelEvent = () => {
-    remove(this.#filmExtraListComponent);
-    remove(this.#filmExtraContainerComponent);
-    this.#filmExtraListComponent = new FilmListView();
-    this.#filmExtraContainerComponent = new FilmContainerView();
-    this.init({filmCards: this.#filmsModel.films});
+  #handleModelEvent = (updateType) => {
+    if (updateType !== UpdateType.INIT) {
+      remove(this.#filmExtraListComponent);
+      remove(this.#filmExtraContainerComponent);
+      this.#filmExtraListComponent = new FilmListView();
+      this.#filmExtraContainerComponent = new FilmContainerView();
+      this.init({filmCards: this.#filmsModel.films});
+    }
   };
 
   #handleModeChange = (filmCard) => {
     this.#popupPresenter.removePopup();
     this.#popupPresenter.init(filmCard);
+    this.#commentsModel.init(filmCard);
     this.mode(Mode.POPUP);
   };
 
