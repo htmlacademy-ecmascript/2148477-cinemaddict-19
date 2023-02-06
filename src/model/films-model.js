@@ -1,42 +1,85 @@
 import Observable from '../framework/observable.js';
-import { getRandomFilmData } from '../mock/films-data.js';
-
-const FILMS_COUNT = 36;
+import { UpdateType } from '../util/const.js';
 
 export default class FilmsModel extends Observable {
   #filmsApiService = null;
-  #films = Array.from({length: FILMS_COUNT}, getRandomFilmData);
+  #films = [];
 
   constructor({filmsApiService}) {
     super();
     this.#filmsApiService = filmsApiService;
-
-    this.#filmsApiService.films.then((tasks) => {
-      console.log(tasks);
-      // Есть проблема: cтруктура объекта похожа, но некоторые ключи называются иначе,
-      // а ещё на сервере используется snake_case, а у нас camelCase.
-      // Можно, конечно, переписать часть нашего клиентского приложения, но зачем?
-      // Есть вариант получше - паттерн "Адаптер"
-    });
   }
 
   get films() {
     return this.#films;
   }
 
-  updateFilm(updateType, update) {
+  async init() {
+    try {
+      const films = await this.#filmsApiService.films;
+      this.#films = films.map(this.#adaptToClient);
+    } catch(err) {
+      this.#films = [];
+    }
+
+    this._notify(UpdateType.INIT);
+  }
+
+  async updateFilm(updateType, update) {
     const index = this.#films.findIndex((film) => film.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t update unexisting film');
     }
 
-    this.#films = [
-      ...this.#films.slice(0, index),
-      update,
-      ...this.#films.slice(index + 1),
-    ];
+    try {
+      const response = await this.#filmsApiService.updateFilm(update);
+      const updatedFilm = this.#adaptToClient(response);
+      this.#films = [
+        ...this.#films.slice(0, index),
+        updatedFilm,
+        ...this.#films.slice(index + 1),
+      ];
+      this._notify(updateType, updatedFilm);
+    } catch(err) {
+      throw new Error('Can\'t update film');
+    }
+  }
 
-    this._notify(updateType, update);
+  #adaptToClient(film) {
+    const filmInfoProp = film['film_info'];
+    const releaseProp = filmInfoProp['release'];
+    const userDetailsProp = film['user_details'];
+
+    const adaptedFilm = {
+      ...film,
+      filmInfo: {
+        ...filmInfoProp,
+        alternativeTitle: filmInfoProp['alternative_title'],
+        totalRating: filmInfoProp['total_rating'],
+        ageRating: filmInfoProp['age_rating'],
+        release: {
+          date: releaseProp['date'] !== null ? new Date(releaseProp['date']) : null,
+          releaseCountry: releaseProp['release_country'],
+        },
+      },
+      userDetails: {
+        ...userDetailsProp,
+        alreadyWatched: userDetailsProp['already_watched'],
+        watchingDate: userDetailsProp['watching_date'] !== null ? new Date(userDetailsProp['watching_date']) : null,
+      },
+    };
+
+    // Ненужные ключи мы удаляем
+    delete adaptedFilm['film_info'];
+    delete adaptedFilm.filmInfo['alternative_title'];
+    delete adaptedFilm.filmInfo['total_rating'];
+    delete adaptedFilm.filmInfo['age_rating'];
+    delete adaptedFilm.filmInfo.release['release_country'];
+    delete adaptedFilm['user_details'];
+    delete adaptedFilm.userDetails['already_watched'];
+    delete adaptedFilm.userDetails['watching_date'];
+
+    return adaptedFilm;
   }
 }

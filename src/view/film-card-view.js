@@ -1,10 +1,10 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import {getReleaseYear, getHoursMinutes} from '../util/date-time.js';
-// import {getPreviewFilmDescription} from '../util/film-description.js';
+import {getPreviewFilmDescription} from '../util/film-description.js';
 
 function createFilmCardTemplate(filmCard) {
-  const {filmInfo, comments, userDetails, id} = filmCard;
-  // getPreviewFilmDescription(filmInfo.description)
+  const {filmInfo, comments, userDetails} = filmCard;
+
   return (
     `<article class="film-card">
       <a class="film-card__link">
@@ -16,7 +16,7 @@ function createFilmCardTemplate(filmCard) {
           <span class="film-card__genre">${filmInfo.genre[0]}</span>
         </p>
         <img src=${filmInfo.poster} alt="" class="film-card__poster">
-        <p class="film-card__description">${id}</p>
+        <p class="film-card__description">${getPreviewFilmDescription(filmInfo.description)}</p>
         <span class="film-card__comments">${comments.length} comments</span>
       </a>
       <div class="film-card__controls">

@@ -5,12 +5,13 @@ export default class FooterStatisticPresenter {
   #container = null;
   #filmCardsCount = 0;
 
-  constructor({container, filmsModel}) {
+  constructor({container}) {
     this.#container = container;
-    this.#filmCardsCount = [...filmsModel.films].length;
   }
 
-  init() {
+  init(filmsModel) {
+    this.#filmCardsCount = filmsModel.films.length;
+
     render(new FooterStatisticView({filmsCount: this.#filmCardsCount}), this.#container);
   }
 }

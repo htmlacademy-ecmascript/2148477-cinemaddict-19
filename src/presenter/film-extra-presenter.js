@@ -5,7 +5,7 @@ import FilmContainerView from '../view/film-container-view.js';
 import FilmCardPresenter from './film-card-presenter.js';
 
 import { render, remove } from '../framework/render.js';
-import { Mode } from '../util/const.js';
+import { Mode, UpdateType } from '../util/const.js';
 
 export default class FilmExtraPresenter {
   #filmExtraListComponent = new FilmListView();
@@ -47,12 +47,14 @@ export default class FilmExtraPresenter {
     this.#renderFilmExtra();
   }
 
-  #handleModelEvent = () => {
-    remove(this.#filmExtraListComponent);
-    remove(this.#filmExtraContainerComponent);
-    this.#filmExtraListComponent = new FilmListView();
-    this.#filmExtraContainerComponent = new FilmContainerView();
-    this.init({filmCards: this.#filmsModel.films});
+  #handleModelEvent = (updateType) => {
+    if (updateType !== UpdateType.INIT) {
+      remove(this.#filmExtraListComponent);
+      remove(this.#filmExtraContainerComponent);
+      this.#filmExtraListComponent = new FilmListView();
+      this.#filmExtraContainerComponent = new FilmContainerView();
+      this.init({filmCards: this.#filmsModel.films});
+    }
   };
 
   #handleModeChange = (filmCard) => {
