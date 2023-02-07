@@ -4,6 +4,7 @@ import { UpdateType } from '../util/const.js';
 export default class FilmsModel extends Observable {
   #filmsApiService = null;
   #films = [];
+  #data = null;
 
   constructor({filmsApiService}) {
     super();
@@ -14,7 +15,7 @@ export default class FilmsModel extends Observable {
     return this.#films;
   }
 
-  async init() {
+  async init(updateType = UpdateType.INIT) {
     try {
       const films = await this.#filmsApiService.films;
       this.#films = films.map(this.#adaptToClient);
@@ -22,7 +23,7 @@ export default class FilmsModel extends Observable {
       this.#films = [];
     }
 
-    this._notify(UpdateType.INIT);
+    this._notify(updateType, this.#data);
   }
 
   async updateFilm(updateType, update) {
@@ -45,6 +46,13 @@ export default class FilmsModel extends Observable {
       throw new Error('Can\'t update film');
     }
   }
+
+  handleCommentsModelChange = (updateType, data) => {
+    if (updateType !== UpdateType.INIT) {
+      this.#data = data.filmInfo ? data : this.#adaptToClient(data);
+      this.init(updateType);
+    }
+  };
 
   #adaptToClient(film) {
     const filmInfoProp = film['film_info'];

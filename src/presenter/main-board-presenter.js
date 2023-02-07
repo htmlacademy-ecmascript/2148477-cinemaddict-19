@@ -157,7 +157,7 @@ export default class MainBoardPresenter {
     this.mode = Mode.POPUP;
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = (actionType, updateType, update, rest) => {
     switch (actionType) {
       case UserAction.UPDATE_FILM_CARD:
         this.#filmsModel.updateFilm(updateType, update);
@@ -166,7 +166,7 @@ export default class MainBoardPresenter {
         this.#commentsModel.addComment(updateType, update);
         break;
       case UserAction.DELETE_COMMENT:
-        this.#commentsModel.deleteComment(updateType, update);
+        this.#commentsModel.deleteComment(updateType, update, rest);
         break;
     }
   };
@@ -206,12 +206,14 @@ export default class MainBoardPresenter {
         break;
 
       case UpdateType.INIT:
-        this.#isLoading = false;
-        remove(this.#loadingComponent);
-        this.#renderHeader();
-        this.#renderMainBoard();
-        this.#footerStatisticPresenter.init(this.#filmsModel);
-        break;
+        if (this.#isLoading) {
+          this.#isLoading = false;
+          remove(this.#loadingComponent);
+          this.#renderHeader();
+          this.#renderMainBoard();
+          this.#footerStatisticPresenter.init(this.#filmsModel);
+          break;
+        }
     }
   };
 
@@ -247,7 +249,6 @@ export default class MainBoardPresenter {
       onFilmCardChange: this.#handleViewAction,
       filmCardContainer: this.#filmContainerComponent.element,
       onModeChange: this.#handleModeChange,
-      isMainBoard: true,
     });
 
     filmCardPresenter.init({filmCard});

@@ -12,11 +12,10 @@ export default class FilmCardPresenter {
 
   #filmCard = null;
 
-  constructor({onFilmCardChange, filmCardContainer, onModeChange, isMainBoard = false}) {
+  constructor({onFilmCardChange, filmCardContainer, onModeChange}) {
     this.#handleFilmCardChange = onFilmCardChange;
     this.#filmCardContainer = filmCardContainer;
     this.#handleModeChange = onModeChange;
-    this.isMainBoard = isMainBoard;
   }
 
   init({filmCard}) {

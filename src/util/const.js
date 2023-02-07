@@ -44,6 +44,7 @@ const UpdateType = {
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
   INIT: 'INIT',
+  REINIT: 'REINIT',
 };
 
 const FILM_EXTRA_HEADER = {

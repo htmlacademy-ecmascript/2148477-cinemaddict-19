@@ -10,7 +10,6 @@ import PopupCommentLoadingView from '../view/popup-comment-loading-view.js';
 import { render, remove } from '../framework/render.js';
 import { Mode } from '../util/const.js';
 import { UserAction, UpdateType } from '../util/const.js';
-import { setCommentDate } from '../util/date-time.js';
 
 export default class PopupPresenter {
   #popupComponent = new PopupView();
@@ -47,6 +46,7 @@ export default class PopupPresenter {
     this.#popupCommentNewComponent = new PopupCommentNewView({onFormSubmit: this.#handleFormSubmit});
 
     this.#commentsModel.addObserver(this.#handleCommentsModelEvent);
+    this.#commentsModel.addObserver(this.#filmsModel.handleCommentsModelChange);
     this.#filmsModel.addObserver(this.#handleModelEvent);
   }
 
@@ -105,49 +105,45 @@ export default class PopupPresenter {
   }
 
   #handleFormSubmit = (comment) => {
-    const newCommentId = Math.round( Math.random() * 1000 );
+    // const newCommentId = Math.round( Math.random() * 1000 );
 
     this.#handleViewAction(
       UserAction.ADD_COMMENT,
       UpdateType.PATCH,
-      {
-        ...comment,
-        id: newCommentId,
-        author: 'anonymous',
-        date: setCommentDate(),
-      }
+      comment,
     );
 
-    this.#handleViewAction(
-      UserAction.UPDATE_FILM_CARD,
-      UpdateType.PATCH,
-      {
-        ...this.#filmCard,
-        comments: [...this.#filmCard.comments, newCommentId],
-      }
-    );
+    // this.#handleViewAction(
+    //   UserAction.UPDATE_FILM_CARD,
+    //   UpdateType.PATCH,
+    //   {
+    //     ...this.#filmCard,
+    //     comments: [...this.#filmCard.comments, newCommentId],
+    //   }
+    // );
   };
 
   #handleDeleteClick = (comment) => {
     this.#handleViewAction(
       UserAction.DELETE_COMMENT,
       UpdateType.PATCH,
-      comment
+      comment,
+      this.#filmCard
     );
 
-    const index = this.#comments.findIndex((comm) => comm.id === comment.id);
+    // const index = this.#comments.findIndex((comm) => comm.id === comment.id);
 
-    this.#handleViewAction(
-      UserAction.UPDATE_FILM_CARD,
-      UpdateType.PATCH,
-      {
-        ...this.#filmCard,
-        comments: [
-          ...this.#filmCard.comments.slice(0, index),
-          ...this.#filmCard.comments.slice(index + 1),
-        ]
-      }
-    );
+    // this.#handleViewAction(
+    //   UserAction.UPDATE_FILM_CARD,
+    //   UpdateType.PATCH,
+    //   {
+    //     ...this.#filmCard,
+    //     comments: [
+    //       ...this.#filmCard.comments.slice(0, index),
+    //       ...this.#filmCard.comments.slice(index + 1),
+    //     ]
+    //   }
+    // );
   };
 
   #handleCommentsModelEvent = (updateType) => {
