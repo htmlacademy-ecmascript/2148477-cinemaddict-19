@@ -99,7 +99,7 @@ export default class PopupPresenter {
 
     render(this.#popupCommentNewComponent, this.#popupCommentContainerComponent.element.firstElementChild);
 
-    // render popup block
+    // render popup block end
 
     if (this.#mode() === Mode.POPUP) {
       this.#popupComponent.restoreScroll();

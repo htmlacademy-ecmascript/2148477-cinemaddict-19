@@ -163,7 +163,7 @@ export default class MainBoardPresenter {
         try {
           await this.#filmsModel.updateFilm(updateType, update);
         } catch(err) {
-          if (this.mode === Mode.POPUP && this.#popupPresenter === rest) {
+          if (this.#popupPresenter === rest) {
             this.#popupPresenter.setAborting(actionType);
           }
           this.#filmCardPresenterList.get(update.id).find((presenter) => presenter === rest)?.setAborting();
@@ -322,9 +322,6 @@ export default class MainBoardPresenter {
     if (resetRenderedFilmCardsCount) {
       this.#renderedFilmCardsCount = FILM_CARDS_COUNT_PER_STEP;
     } else {
-      // На случай, если перерисовка доски вызвана
-      // уменьшением количества фильмов (например, выпадение карточки из отфильтрованного списка)
-      // нужно скорректировать число показанных задач
       this.#renderedFilmCardsCount = Math.min(filmCardsCount, this.#renderedFilmCardsCount);
     }
 

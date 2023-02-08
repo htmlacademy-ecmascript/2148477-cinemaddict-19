@@ -78,7 +78,6 @@ export default class FilmsModel extends Observable {
       },
     };
 
-    // Ненужные ключи мы удаляем
     delete adaptedFilm['film_info'];
     delete adaptedFilm.filmInfo['alternative_title'];
     delete adaptedFilm.filmInfo['total_rating'];
