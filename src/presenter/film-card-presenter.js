@@ -12,11 +12,10 @@ export default class FilmCardPresenter {
 
   #filmCard = null;
 
-  constructor({onFilmCardChange, filmCardContainer, onModeChange, isMainBoard = false}) {
+  constructor({onFilmCardChange, filmCardContainer, onModeChange}) {
     this.#handleFilmCardChange = onFilmCardChange;
     this.#filmCardContainer = filmCardContainer;
     this.#handleModeChange = onModeChange;
-    this.isMainBoard = isMainBoard;
   }
 
   init({filmCard}) {
@@ -46,6 +45,10 @@ export default class FilmCardPresenter {
     remove(this.#filmCardComponent);
   }
 
+  setAborting() {
+    this.#filmCardComponent.shake();
+  }
+
   #handleWatchlistClick = () => {
     this.#handleFilmCardChange(
       UserAction.UPDATE_FILM_CARD,
@@ -56,7 +59,8 @@ export default class FilmCardPresenter {
           ...this.#filmCard.userDetails,
           watchlist: !this.#filmCard.userDetails.watchlist
         }
-      }
+      },
+      this,
     );
   };
 
@@ -70,7 +74,8 @@ export default class FilmCardPresenter {
           ...this.#filmCard.userDetails,
           alreadyWatched: !this.#filmCard.userDetails.alreadyWatched
         }
-      }
+      },
+      this,
     );
   };
 
@@ -84,7 +89,8 @@ export default class FilmCardPresenter {
           ...this.#filmCard.userDetails,
           favorite: !this.#filmCard.userDetails.favorite
         }
-      }
+      },
+      this,
     );
   };
 

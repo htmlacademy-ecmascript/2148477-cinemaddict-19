@@ -15,17 +15,22 @@ import HeaderPresenter from './header-presenter.js';
 import FooterStatisticPresenter from './footer-statistic-presenter.js';
 
 import { remove, render, replace, RenderPosition } from '../framework/render.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+
 import { sortMainDate, sortMainRating, sortTopRated, sortMostCommented } from '../util/sort-film-cards.js';
 import { filter } from '../util/film-card-filter.js';
 import { Mode, SortType, UpdateType, UserAction, FILM_EXTRA_CARD_COUNT, FILM_EXTRA_HEADER, FilterType } from '../util/const.js';
 
 const FILM_CARDS_COUNT_PER_STEP = 5;
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class MainBoardPresenter {
   #page = document.querySelector('.page');
 
   #filmWrapperComponent = new FilmWrapperView();
-
   #filmListComponent = new FilmListView();
   #filmHeaderComponent = new FilmListHeaderView();
   #filmContainerComponent = new FilmContainerView();
@@ -33,6 +38,11 @@ export default class MainBoardPresenter {
   #sortBarComponent = null;
   #noFilmCardsComponent = null;
   #loadingComponent = new LoadingView();
+
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   #popupPresenter = null;
   #filterBarPresenter = null;
@@ -157,18 +167,37 @@ export default class MainBoardPresenter {
     this.mode = Mode.POPUP;
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update, rest) => {
+    this.#uiBlocker.block();
+
     switch (actionType) {
       case UserAction.UPDATE_FILM_CARD:
-        this.#filmsModel.updateFilm(updateType, update);
+        try {
+          await this.#filmsModel.updateFilm(updateType, update);
+        } catch(err) {
+          if (this.#popupPresenter === rest) {
+            this.#popupPresenter.setAborting(actionType);
+          }
+          this.#filmCardPresenterList.get(update.id).find((presenter) => presenter === rest)?.setAborting();
+        }
         break;
       case UserAction.ADD_COMMENT:
-        this.#commentsModel.addComment(updateType, update);
+        try {
+          await this.#commentsModel.addComment(updateType, update);
+        } catch(err) {
+          this.#popupPresenter.setAborting(actionType);
+        }
         break;
       case UserAction.DELETE_COMMENT:
-        this.#commentsModel.deleteComment(updateType, update);
+        try {
+          await this.#commentsModel.deleteComment(updateType, update, rest);
+        } catch(err) {
+          this.#popupPresenter.setAborting(actionType, update);
+        }
         break;
     }
+
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
@@ -206,12 +235,14 @@ export default class MainBoardPresenter {
         break;
 
       case UpdateType.INIT:
-        this.#isLoading = false;
-        remove(this.#loadingComponent);
-        this.#renderHeader();
-        this.#renderMainBoard();
-        this.#footerStatisticPresenter.init(this.#filmsModel);
-        break;
+        if (this.#isLoading) {
+          this.#isLoading = false;
+          remove(this.#loadingComponent);
+          this.#renderHeader();
+          this.#renderMainBoard();
+          this.#footerStatisticPresenter.init(this.#filmsModel);
+          break;
+        }
     }
   };
 
@@ -247,7 +278,6 @@ export default class MainBoardPresenter {
       onFilmCardChange: this.#handleViewAction,
       filmCardContainer: this.#filmContainerComponent.element,
       onModeChange: this.#handleModeChange,
-      isMainBoard: true,
     });
 
     filmCardPresenter.init({filmCard});
@@ -306,9 +336,6 @@ export default class MainBoardPresenter {
     if (resetRenderedFilmCardsCount) {
       this.#renderedFilmCardsCount = FILM_CARDS_COUNT_PER_STEP;
     } else {
-      // На случай, если перерисовка доски вызвана
-      // уменьшением количества фильмов (например, выпадение карточки из отфильтрованного списка)
-      // нужно скорректировать число показанных задач
       this.#renderedFilmCardsCount = Math.min(filmCardsCount, this.#renderedFilmCardsCount);
     }
 

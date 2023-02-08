@@ -15,32 +15,31 @@ function createPopupCommentNewTemplate(comment) {
       <div class="film-details__add-emoji-label">
         ${comment.emotion ? `<img src="images/emoji/${comment.emotion}.png" alt="emoji-smile" width="55" height="55">` : ''}
       </div>
-
-      <label class="film-details__comment-label">
-        <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${comment.comment}</textarea>
-      </label>
-
-      <div class="film-details__emoji-list">
-        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile"${comment.emotion === Emotion.SMILE ? ' checked' : ''}>
-        <label class="film-details__emoji-label" for="emoji-smile">
-          <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji" data-emoji ="smile">
+        <label class="film-details__comment-label">
+          <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"${comment.isDisabled ? ' disabled' : ''}>${comment.comment}</textarea>
         </label>
 
-        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping"${comment.emotion === Emotion.SLEEPING ? ' checked' : ''}>
-        <label class="film-details__emoji-label" for="emoji-sleeping">
-          <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji" data-emoji ="sleeping">
-        </label>
+        <div class="film-details__emoji-list">
+          <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile"${comment.emotion === Emotion.SMILE ? ' checked' : ''}${comment.isDisabled ? ' disabled' : ''}>
+          <label class="film-details__emoji-label" for="emoji-smile">
+            <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji" data-emoji ="smile">
+          </label>
 
-        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke"${comment.emotion === Emotion.PUKE ? ' checked' : ''}>
-        <label class="film-details__emoji-label" for="emoji-puke">
-          <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji" data-emoji ="puke">
-        </label>
+          <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping"${comment.emotion === Emotion.SLEEPING ? ' checked' : ''}${comment.isDisabled ? ' disabled' : ''}>
+          <label class="film-details__emoji-label" for="emoji-sleeping">
+            <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji" data-emoji ="sleeping">
+          </label>
 
-        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry"${comment.emotion === Emotion.ANGRY ? ' checked' : ''}>
-        <label class="film-details__emoji-label" for="emoji-angry">
-          <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji" data-emoji ="angry">
-        </label>
-      </div>
+          <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke"${comment.emotion === Emotion.PUKE ? ' checked' : ''}${comment.isDisabled ? ' disabled' : ''}>
+          <label class="film-details__emoji-label" for="emoji-puke">
+            <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji" data-emoji ="puke">
+          </label>
+
+          <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry"${comment.emotion === Emotion.ANGRY ? ' checked' : ''}${comment.isDisabled ? ' disabled' : ''}>
+          <label class="film-details__emoji-label" for="emoji-angry">
+            <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji" data-emoji ="angry">
+          </label>
+        </div>
     </form>`
   );
 }
@@ -96,17 +95,24 @@ export default class PopupCommentNewView extends AbstractStatefulView {
 
   #chooseEmojiHandler = (evt) => {
     evt.preventDefault();
-    this.updateElement({
-      emotion: evt.target.dataset.emoji,
-    });
+    if (!this._state.isDisabled) {
+      this.updateElement({
+        emotion: evt.target.dataset.emoji,
+      });
+    }
   };
 
   static parseCommentToState(comment) {
-    return {...comment};
+    return {
+      ...comment,
+      isDisabled: false,
+    };
   }
 
   static parseStateToComment(state) {
     const comment = {...state};
+
+    delete comment.isDisabled;
 
     return comment;
   }

@@ -31,13 +31,8 @@ function getCommentDate(commentDate) {
   return humanizedCommentDate;
 }
 
-function setCommentDate() {
-  return dayjs().toJSON();
-}
-
-
 function getHoursMinutes(minutes) {
   return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
 }
 
-export {getReleaseYear, getHoursMinutes, getReleaseDate, getCommentDate, setCommentDate};
+export {getReleaseYear, getHoursMinutes, getReleaseDate, getCommentDate};

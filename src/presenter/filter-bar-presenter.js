@@ -66,7 +66,7 @@ export default class FilterBarPresenter {
   }
 
   #handleModelEvent = (updateType) => {
-    if (updateType !== UpdateType.INIT) {
+    if (updateType !== UpdateType.INIT && updateType !== UpdateType.PATCH) {
       this.init();
     }
   };
