@@ -11,7 +11,7 @@ function createPopupCommentTemplate(comment, state) {
       <div>
         <p class="film-details__comment-text">${he.encode(comment.comment)}</p>
         <p class="film-details__comment-info">
-          <span class="film-details__comment-author">${comment.author}</span>
+          <span class="film-details__comment-author">${he.encode(comment.author)}</span>
           <span class="film-details__comment-day">${getCommentDate(comment.date)}</span>
           <button class="film-details__comment-delete"${state.isDeleting ? ' disabled' : ''}>${state.isDeleting ? 'Deleting ...' : 'Delete'}</button>
         </p>
