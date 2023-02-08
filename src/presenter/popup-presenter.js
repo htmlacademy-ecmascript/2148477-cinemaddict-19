@@ -22,7 +22,7 @@ export default class PopupPresenter {
   #commentsModel = null;
   #handleViewAction = null;
   #handlePopupRemoval = null;
-  #mode = null;
+  #getMode = null;
 
   #filmsModel = null;
 
@@ -37,13 +37,13 @@ export default class PopupPresenter {
 
   #isLoading = true;
 
-  constructor({filmsModel, commentsModel, container, onViewAction, onPopupRemove, mode}) {
+  constructor({filmsModel, commentsModel, container, onViewAction, onPopupRemove, getMode}) {
     this.#container = container;
     this.#handleViewAction = onViewAction;
     this.#filmsModel = filmsModel;
     this.#commentsModel = commentsModel;
     this.#handlePopupRemoval = onPopupRemove;
-    this.#mode = mode;
+    this.#getMode = getMode;
 
     this.#popupCommentNewComponent = new PopupCommentNewView({onFormSubmit: this.#handleFormSubmit});
 
@@ -68,8 +68,6 @@ export default class PopupPresenter {
       onAlreadyWatchedClick: this.#alreadyWatchedClickHandler,
       onFavoriteClick: this.#favoriteClickHandler,
     });
-
-    // render popup block
 
     this.#container.classList.add('hide-overflow');
     this.#container.addEventListener('keydown', this.#escKeyDownHandler);
@@ -99,9 +97,7 @@ export default class PopupPresenter {
 
     render(this.#popupCommentNewComponent, this.#popupCommentContainerComponent.element.firstElementChild);
 
-    // render popup block end
-
-    if (this.#mode() === Mode.POPUP) {
+    if (this.#getMode() === Mode.POPUP) {
       this.#popupComponent.restoreScroll();
     }
   }
@@ -122,11 +118,6 @@ export default class PopupPresenter {
     }
   }
 
-  #renderLoading() {
-    this.#popupCommentLoadingComponent = new PopupCommentLoadingView();
-    render(this.#popupCommentLoadingComponent, this.#popupCommentContainerComponent.element.firstElementChild);
-  }
-
   setDisabled() {
     this.#popupCommentNewComponent.updateElement({
       isDisabled: true,
@@ -138,44 +129,6 @@ export default class PopupPresenter {
       isDeleting: true,
     });
   }
-
-  #handleFormSubmit = (comment) => {
-    this.setDisabled();
-
-    this.#handleViewAction(
-      UserAction.ADD_COMMENT,
-      UpdateType.PATCH,
-      comment,
-    );
-  };
-
-  #handleDeleteClick = (comment, commentComponent) => {
-    this.setDeleting(commentComponent);
-
-    this.#handleViewAction(
-      UserAction.DELETE_COMMENT,
-      UpdateType.PATCH,
-      comment,
-      this.#filmCard
-    );
-  };
-
-  #handleCommentsModelEvent = (updateType) => {
-    if (updateType === UpdateType.INIT) {
-      this.#isLoading = false;
-      remove(this.#popupCommentLoadingComponent);
-    }
-
-    this.earsePopup();
-    this.init( this.#filmsModel.films.find( (element) => element.id === this.#filmCard.id ) );
-  };
-
-  #handleFilmsModelEvent = () => {
-    if (this.#mode() === Mode.POPUP) {
-      this.earsePopup();
-      this.init( this.#filmsModel.films.find( (element) => element.id === this.#filmCard.id ) );
-    }
-  };
 
   earsePopup = () => {
     remove(this.#popupFilmDetailsComponent);
@@ -206,6 +159,49 @@ export default class PopupPresenter {
 
     this.#handlePopupRemoval();
     this.#isLoading = true;
+  };
+
+  #renderLoading() {
+    this.#popupCommentLoadingComponent = new PopupCommentLoadingView();
+    render(this.#popupCommentLoadingComponent, this.#popupCommentContainerComponent.element.firstElementChild);
+  }
+
+  #handleCommentsModelEvent = (updateType) => {
+    if (updateType === UpdateType.INIT) {
+      this.#isLoading = false;
+      remove(this.#popupCommentLoadingComponent);
+    }
+
+    this.earsePopup();
+    this.init( this.#filmsModel.films.find( (element) => element.id === this.#filmCard.id ) );
+  };
+
+  #handleFilmsModelEvent = () => {
+    if (this.#getMode() === Mode.POPUP) {
+      this.earsePopup();
+      this.init( this.#filmsModel.films.find( (element) => element.id === this.#filmCard.id ) );
+    }
+  };
+
+  #handleFormSubmit = (comment) => {
+    this.setDisabled();
+
+    this.#handleViewAction(
+      UserAction.ADD_COMMENT,
+      UpdateType.PATCH,
+      comment,
+    );
+  };
+
+  #handleDeleteClick = (comment, commentComponent) => {
+    this.setDeleting(commentComponent);
+
+    this.#handleViewAction(
+      UserAction.DELETE_COMMENT,
+      UpdateType.PATCH,
+      comment,
+      this.#filmCard
+    );
   };
 
   #escKeyDownHandler = (evt) => {

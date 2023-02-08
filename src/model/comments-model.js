@@ -46,12 +46,6 @@ export default class CommentsModel extends Observable {
     }
 
     try {
-      // Обратите внимание, метод удаления задачи на сервере
-      // ничего не возвращает. Это и верно,
-      // ведь что можно вернуть при удалении задачи?
-
-      // например id фильма, из которого был удален коммент!
-
       await this.#commentsApiService.deleteComment(update);
       this.#comments = [
         ...this.#comments.slice(0, index),

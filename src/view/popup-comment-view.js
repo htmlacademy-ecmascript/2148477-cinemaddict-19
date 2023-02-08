@@ -33,17 +33,17 @@ export default class PopupCommentView extends AbstractStatefulView {
     this._restoreHandlers();
   }
 
-  _restoreHandlers() {
-    this.element.querySelector('.film-details__comment-delete').addEventListener('click', this.#deleteClickHandler);
-
-  }
-
   get template() {
     return createPopupCommentTemplate(this.#comment, this._state);
   }
 
   get id() {
     return this.#comment.id;
+  }
+
+  _restoreHandlers() {
+    this.element.querySelector('.film-details__comment-delete').addEventListener('click', this.#deleteClickHandler);
+
   }
 
   #deleteClickHandler = () => {

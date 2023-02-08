@@ -4,13 +4,7 @@ import he from 'he';
 
 function createPopupFilmDetailsTemplate(filmCard) {
   function getGenresList(genres) {
-    let genresTemplate = '';
-
-    for (const genre of genres) {
-      genresTemplate += `<span class="film-details__genre">${he.encode(genre)}</span>`;
-    }
-
-    return genresTemplate;
+    return genres.map((genre) => `<span class="film-details__genre">${he.encode(genre)}</span>`).join('');
   }
 
   return (
