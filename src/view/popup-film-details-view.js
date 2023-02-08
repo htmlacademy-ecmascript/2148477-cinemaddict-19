@@ -2,11 +2,11 @@ import AbstractView from '../framework/view/abstract-view';
 import {getReleaseDate, getHoursMinutes} from '../util/date-time.js';
 import he from 'he';
 
-function createPopupFilmDetailsTemplate(filmCard) {
-  function getGenresList(genres) {
-    return genres.map((genre) => `<span class="film-details__genre">${he.encode(genre)}</span>`).join('');
-  }
+function getGenresList(genres) {
+  return genres.map((genre) => `<span class="film-details__genre">${he.encode(genre)}</span>`).join('');
+}
 
+function createPopupFilmDetailsTemplate(filmCard) {
   return (
     `<div class="film-details__top-container">
       <div class="film-details__close">
