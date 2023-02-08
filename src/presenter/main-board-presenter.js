@@ -15,17 +15,22 @@ import HeaderPresenter from './header-presenter.js';
 import FooterStatisticPresenter from './footer-statistic-presenter.js';
 
 import { remove, render, replace, RenderPosition } from '../framework/render.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+
 import { sortMainDate, sortMainRating, sortTopRated, sortMostCommented } from '../util/sort-film-cards.js';
 import { filter } from '../util/film-card-filter.js';
 import { Mode, SortType, UpdateType, UserAction, FILM_EXTRA_CARD_COUNT, FILM_EXTRA_HEADER, FilterType } from '../util/const.js';
 
 const FILM_CARDS_COUNT_PER_STEP = 5;
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class MainBoardPresenter {
   #page = document.querySelector('.page');
 
   #filmWrapperComponent = new FilmWrapperView();
-
   #filmListComponent = new FilmListView();
   #filmHeaderComponent = new FilmListHeaderView();
   #filmContainerComponent = new FilmContainerView();
@@ -33,6 +38,11 @@ export default class MainBoardPresenter {
   #sortBarComponent = null;
   #noFilmCardsComponent = null;
   #loadingComponent = new LoadingView();
+
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   #popupPresenter = null;
   #filterBarPresenter = null;
@@ -158,6 +168,8 @@ export default class MainBoardPresenter {
   };
 
   #handleViewAction = async (actionType, updateType, update, rest) => {
+    this.#uiBlocker.block();
+
     switch (actionType) {
       case UserAction.UPDATE_FILM_CARD:
         try {
@@ -184,6 +196,8 @@ export default class MainBoardPresenter {
         }
         break;
     }
+
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
