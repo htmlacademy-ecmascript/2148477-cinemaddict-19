@@ -157,16 +157,31 @@ export default class MainBoardPresenter {
     this.mode = Mode.POPUP;
   };
 
-  #handleViewAction = (actionType, updateType, update, rest) => {
+  #handleViewAction = async (actionType, updateType, update, rest) => {
     switch (actionType) {
       case UserAction.UPDATE_FILM_CARD:
-        this.#filmsModel.updateFilm(updateType, update);
+        try {
+          await this.#filmsModel.updateFilm(updateType, update);
+        } catch(err) {
+          if (this.mode === Mode.POPUP && this.#popupPresenter === rest) {
+            this.#popupPresenter.setAborting(actionType);
+          }
+          this.#filmCardPresenterList.get(update.id).find((presenter) => presenter === rest)?.setAborting();
+        }
         break;
       case UserAction.ADD_COMMENT:
-        this.#commentsModel.addComment(updateType, update);
+        try {
+          await this.#commentsModel.addComment(updateType, update);
+        } catch(err) {
+          this.#popupPresenter.setAborting(actionType);
+        }
         break;
       case UserAction.DELETE_COMMENT:
-        this.#commentsModel.deleteComment(updateType, update, rest);
+        try {
+          await this.#commentsModel.deleteComment(updateType, update, rest);
+        } catch(err) {
+          this.#popupPresenter.setAborting(actionType, update);
+        }
         break;
     }
   };

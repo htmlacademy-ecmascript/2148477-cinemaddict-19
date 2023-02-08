@@ -1,5 +1,6 @@
 import PopupView from '../view/popup-view.js';
 import PopupFilmDetailsView from '../view/popup-film-details-view.js';
+import PopupFilmControlsView from '../view/popup-film-controls-view.js';
 import PopupCommentContainerView from '../view/popup-comment-container-view.js';
 import PopupCommentHeaderView from '../view/popup-comment-header-view.js';
 import PopupCommentListView from '../view/popup-comment-list-view.js';
@@ -7,7 +8,7 @@ import PopupCommentNewView from '../view/popup-comment-new-view.js';
 import PopupCommentView from '../view/popup-comment-view.js';
 import PopupCommentLoadingView from '../view/popup-comment-loading-view.js';
 
-import { render, remove } from '../framework/render.js';
+import { render, remove, RenderPosition } from '../framework/render.js';
 import { Mode } from '../util/const.js';
 import { UserAction, UpdateType } from '../util/const.js';
 
@@ -26,6 +27,7 @@ export default class PopupPresenter {
   #filmsModel = null;
 
   #popupFilmDetailsComponent = null;
+  #popupFilmControlsComponent = null;
   #popupCommentHeaderComponent = null;
   #popupCommentNewComponent = null;
   #popupCommentLoadingComponent = null;
@@ -58,6 +60,10 @@ export default class PopupPresenter {
     this.#popupFilmDetailsComponent = new PopupFilmDetailsView({
       filmCard: this.#filmCard,
       onXClick: this.removePopup,
+    });
+
+    this.#popupFilmControlsComponent = new PopupFilmControlsView({
+      filmCard: this.#filmCard,
       onWatchlistClick: this.#watchlistClickHandler,
       onAlreadyWatchedClick: this.#alreadyWatchedClickHandler,
       onFavoriteClick: this.#favoriteClickHandler,
@@ -71,6 +77,7 @@ export default class PopupPresenter {
     render(this.#popupComponent, this.#container);
 
     render(this.#popupFilmDetailsComponent, this.#popupComponent.element.firstElementChild);
+    render(this.#popupFilmControlsComponent, this.#popupComponent.element.firstElementChild, RenderPosition.BEFOREEND);
 
     render(this.#popupCommentContainerComponent, this.#popupComponent.element.firstElementChild);
     render(this.#popupCommentHeaderComponent, this.#popupCommentContainerComponent.element.firstElementChild);
@@ -96,6 +103,22 @@ export default class PopupPresenter {
 
     if (this.#mode() === Mode.POPUP) {
       this.#popupComponent.restoreScroll();
+    }
+  }
+
+  setAborting(actionType, comment) {
+    if (actionType === UserAction.ADD_COMMENT) {
+      this.#popupCommentNewComponent.shake(this.#popupCommentNewComponent.reset);
+    } else if (actionType === UserAction.DELETE_COMMENT) {
+      const shakingCommentView = this.#commentViews.find((commentView) => commentView.id === comment.id);
+
+      const resetFormState = () => {
+        shakingCommentView.updateElement({isDeleting: false,});
+      };
+
+      shakingCommentView.shake(resetFormState);
+    } else if (actionType === UserAction.UPDATE_FILM_CARD) {
+      this.#popupFilmControlsComponent.shake();
     }
   }
 
@@ -156,6 +179,7 @@ export default class PopupPresenter {
 
   earsePopup = () => {
     remove(this.#popupFilmDetailsComponent);
+    remove(this.#popupFilmControlsComponent);
     remove(this.#popupCommentHeaderComponent);
     this.#commentViews.forEach((commentView) => remove(commentView));
 
@@ -178,6 +202,7 @@ export default class PopupPresenter {
     this.#popupCommentNewComponent.reset();
 
     remove(this.#popupFilmDetailsComponent);
+    remove(this.#popupFilmControlsComponent);
 
     this.#handlePopupRemoval();
     this.#isLoading = true;
@@ -200,7 +225,8 @@ export default class PopupPresenter {
           ...this.#filmCard.userDetails,
           watchlist: !this.#filmCard.userDetails.watchlist
         }
-      }
+      },
+      this,
     );
   };
 
@@ -214,7 +240,8 @@ export default class PopupPresenter {
           ...this.#filmCard.userDetails,
           alreadyWatched: !this.#filmCard.userDetails.alreadyWatched
         }
-      }
+      },
+      this,
     );
   };
 
@@ -228,7 +255,8 @@ export default class PopupPresenter {
           ...this.#filmCard.userDetails,
           favorite: !this.#filmCard.userDetails.favorite
         }
-      }
+      },
+      this,
     );
   };
 }

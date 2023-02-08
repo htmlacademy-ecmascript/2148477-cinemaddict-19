@@ -42,6 +42,10 @@ export default class PopupCommentView extends AbstractStatefulView {
     return createPopupCommentTemplate(this.#comment, this._state);
   }
 
+  get id() {
+    return this.#comment.id;
+  }
+
   #deleteClickHandler = () => {
     this.#handleDeleteClick(this.#comment, this);
   };
