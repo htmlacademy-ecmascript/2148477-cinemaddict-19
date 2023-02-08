@@ -1,5 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { Emotion } from '../util/const.js';
+import he from 'he';
 
 const NEW_COMMENT = {
   id: '',
@@ -16,7 +17,7 @@ function createPopupCommentNewTemplate(comment) {
         ${comment.emotion ? `<img src="images/emoji/${comment.emotion}.png" alt="emoji-smile" width="55" height="55">` : ''}
       </div>
         <label class="film-details__comment-label">
-          <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"${comment.isDisabled ? ' disabled' : ''}>${comment.comment}</textarea>
+          <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"${comment.isDisabled ? ' disabled' : ''}>${he.encode(comment.comment)}</textarea>
         </label>
 
         <div class="film-details__emoji-list">
@@ -79,7 +80,7 @@ export default class PopupCommentNewView extends AbstractStatefulView {
   #commentInputHandler = (evt) => {
     evt.preventDefault();
     this._setState({
-      comment: evt.target.value,
+      comment: he.encode(evt.target.value),
     });
   };
 

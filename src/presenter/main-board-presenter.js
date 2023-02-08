@@ -23,8 +23,8 @@ import { Mode, SortType, UpdateType, UserAction, FILM_EXTRA_CARD_COUNT, FILM_EXT
 
 const FILM_CARDS_COUNT_PER_STEP = 5;
 const TimeLimit = {
-  LOWER_LIMIT: 350,
-  UPPER_LIMIT: 1000,
+  LOWER_LIMIT: 100,
+  UPPER_LIMIT: 700,
 };
 
 export default class MainBoardPresenter {
@@ -61,7 +61,7 @@ export default class MainBoardPresenter {
   #currentSortType = SortType.DEFAULT;
   #currentFilterType = FilterType.ALL;
 
-  mode = Mode.DEFAULT;
+  #mode = Mode.DEFAULT;
 
   #isLoading = true;
 
@@ -76,7 +76,7 @@ export default class MainBoardPresenter {
       commentsModel: this.#commentsModel,
       onViewAction: this.#handleViewAction,
       onPopupRemove: this.#resetMode,
-      mode: this.#getMode,
+      getMode: this.#getMode,
     });
     this.#topRatedPresenter = new FilmExtraPresenter({
       container: this.#filmWrapperComponent,
@@ -136,125 +136,16 @@ export default class MainBoardPresenter {
     this.#renderMainBoard();
   }
 
-  #handleShowMoreButtonClick = () => {
-    const filmCardsCount = this.films.length;
-    const newRenderedFilmCardsCount = Math.min(filmCardsCount, this.#renderedFilmCardsCount + FILM_CARDS_COUNT_PER_STEP);
-    const filmCards = this.films.slice(this.#renderedFilmCardsCount, newRenderedFilmCardsCount);
-
-    this.#renderFilmCards(filmCards);
-
-    this.#renderedFilmCardsCount = newRenderedFilmCardsCount;
-
-    if (this.#renderedFilmCardsCount >= filmCardsCount) {
-      remove(this.#showMoreButtonComponent);
-    }
-  };
-
   #resetMode = () => {
-    this.mode = Mode.DEFAULT;
+    this.#mode = Mode.DEFAULT;
   };
 
-  #getMode = () => this.mode;
+  #getMode = () => this.#mode;
 
   #setMode = (newMode) => {
-    this.mode = newMode;
+    this.#mode = newMode;
   };
 
-  #handleModeChange = (filmCard) => {
-    this.#popupPresenter.removePopup();
-    this.#popupPresenter.init(filmCard);
-    this.#commentsModel.init(filmCard);
-    this.mode = Mode.POPUP;
-  };
-
-  #handleViewAction = async (actionType, updateType, update, rest) => {
-    this.#uiBlocker.block();
-
-    switch (actionType) {
-      case UserAction.UPDATE_FILM_CARD:
-        try {
-          await this.#filmsModel.updateFilm(updateType, update);
-        } catch(err) {
-          if (this.#popupPresenter === rest) {
-            this.#popupPresenter.setAborting(actionType);
-          }
-          this.#filmCardPresenterList.get(update.id).find((presenter) => presenter === rest)?.setAborting();
-        }
-        break;
-      case UserAction.ADD_COMMENT:
-        try {
-          await this.#commentsModel.addComment(updateType, update);
-        } catch(err) {
-          this.#popupPresenter.setAborting(actionType);
-        }
-        break;
-      case UserAction.DELETE_COMMENT:
-        try {
-          await this.#commentsModel.deleteComment(updateType, update, rest);
-        } catch(err) {
-          this.#popupPresenter.setAborting(actionType, update);
-        }
-        break;
-    }
-
-    this.#uiBlocker.unblock();
-  };
-
-  #handleModelEvent = (updateType, data) => {
-    switch (updateType) {
-      case UpdateType.PATCH:
-        // - обновить карточку и экстра презентер при необходимости
-        this.#filmCardPresenterList.get(data.id)?.forEach(
-          (presenter) => {
-            presenter.init({filmCard: data});
-          }
-        );
-        break;
-
-      case UpdateType.MINOR:
-        // - обновить карточку, хедэр и филтер-бар (филтер-бар сам обновится)
-        this.#renderHeader();
-
-        if (this.#filterModel.filter !== FilterType.ALL) {
-          this.#clearMainBoard({ resetRenderedFilmCardsCount: (this.films.length < 5) });
-          this.#renderMainBoard();
-          break;
-        }
-
-        this.#filmCardPresenterList.get(data.id).forEach(
-          (presenter) => {
-            presenter.init({filmCard: data});
-          }
-        );
-        break;
-
-      case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
-        this.#clearMainBoard({resetRenderedFilmCardsCount: true});
-        this.#renderMainBoard();
-        break;
-
-      case UpdateType.INIT:
-        if (this.#isLoading) {
-          this.#isLoading = false;
-          remove(this.#loadingComponent);
-          this.#renderHeader();
-          this.#renderMainBoard();
-          this.#footerStatisticPresenter.init(this.#filmsModel);
-          break;
-        }
-    }
-  };
-
-  #handleSortTypeChange = (sortType) => {
-    if (this.#currentSortType === sortType) {
-      return;
-    }
-
-    this.#clearMainBoard({resetRenderedFilmCardsCount: true, resetSortType: true});
-    this.#currentSortType = sortType;
-    this.#renderMainBoard();
-  };
 
   #renderSortBar() {
     const prevSortBarComponent = this.#sortBarComponent;
@@ -388,4 +279,111 @@ export default class MainBoardPresenter {
   #renderHeader() {
     this.#headerPresenter.init({films: this.films});
   }
+
+  #handleShowMoreButtonClick = () => {
+    const filmCardsCount = this.films.length;
+    const newRenderedFilmCardsCount = Math.min(filmCardsCount, this.#renderedFilmCardsCount + FILM_CARDS_COUNT_PER_STEP);
+    const filmCards = this.films.slice(this.#renderedFilmCardsCount, newRenderedFilmCardsCount);
+
+    this.#renderFilmCards(filmCards);
+
+    this.#renderedFilmCardsCount = newRenderedFilmCardsCount;
+
+    if (this.#renderedFilmCardsCount >= filmCardsCount) {
+      remove(this.#showMoreButtonComponent);
+    }
+  };
+
+  #handleModeChange = (filmCard) => {
+    this.#popupPresenter.removePopup();
+    this.#popupPresenter.init(filmCard);
+    this.#commentsModel.init(filmCard);
+    this.#mode = Mode.POPUP;
+  };
+
+  #handleViewAction = async (actionType, updateType, update, rest) => {
+    this.#uiBlocker.block();
+
+    switch (actionType) {
+      case UserAction.UPDATE_FILM_CARD:
+        try {
+          await this.#filmsModel.updateFilm(updateType, update);
+        } catch(err) {
+          if (this.#popupPresenter === rest) {
+            this.#popupPresenter.setAborting(actionType);
+          }
+          this.#filmCardPresenterList.get(update.id).find((presenter) => presenter === rest)?.setAborting();
+        }
+        break;
+      case UserAction.ADD_COMMENT:
+        try {
+          await this.#commentsModel.addComment(updateType, update);
+        } catch(err) {
+          this.#popupPresenter.setAborting(actionType);
+        }
+        break;
+      case UserAction.DELETE_COMMENT:
+        try {
+          await this.#commentsModel.deleteComment(updateType, update, rest);
+        } catch(err) {
+          this.#popupPresenter.setAborting(actionType, update);
+        }
+        break;
+    }
+
+    this.#uiBlocker.unblock();
+  };
+
+  #handleModelEvent = (updateType, data) => {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#filmCardPresenterList.get(data.id)?.forEach(
+          (presenter) => {
+            presenter.init({filmCard: data});
+          }
+        );
+        break;
+
+      case UpdateType.MINOR:
+        this.#renderHeader();
+
+        if (this.#filterModel.filter !== FilterType.ALL) {
+          this.#clearMainBoard({ resetRenderedFilmCardsCount: (this.films.length < 5) });
+          this.#renderMainBoard();
+          break;
+        }
+
+        this.#filmCardPresenterList.get(data.id).forEach(
+          (presenter) => {
+            presenter.init({filmCard: data});
+          }
+        );
+        break;
+
+      case UpdateType.MAJOR:
+        this.#clearMainBoard({resetRenderedFilmCardsCount: true});
+        this.#renderMainBoard();
+        break;
+
+      case UpdateType.INIT:
+        if (this.#isLoading) {
+          this.#isLoading = false;
+          remove(this.#loadingComponent);
+          this.#renderHeader();
+          this.#renderMainBoard();
+          this.#footerStatisticPresenter.init(this.#filmsModel);
+          break;
+        }
+    }
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#clearMainBoard({resetRenderedFilmCardsCount: true, resetSortType: true});
+    this.#currentSortType = sortType;
+    this.#renderMainBoard();
+  };
 }

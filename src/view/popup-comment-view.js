@@ -11,7 +11,7 @@ function createPopupCommentTemplate(comment, state) {
       <div>
         <p class="film-details__comment-text">${he.encode(comment.comment)}</p>
         <p class="film-details__comment-info">
-          <span class="film-details__comment-author">${comment.author}</span>
+          <span class="film-details__comment-author">${he.encode(comment.author)}</span>
           <span class="film-details__comment-day">${getCommentDate(comment.date)}</span>
           <button class="film-details__comment-delete"${state.isDeleting ? ' disabled' : ''}>${state.isDeleting ? 'Deleting ...' : 'Delete'}</button>
         </p>
@@ -33,17 +33,17 @@ export default class PopupCommentView extends AbstractStatefulView {
     this._restoreHandlers();
   }
 
-  _restoreHandlers() {
-    this.element.querySelector('.film-details__comment-delete').addEventListener('click', this.#deleteClickHandler);
-
-  }
-
   get template() {
     return createPopupCommentTemplate(this.#comment, this._state);
   }
 
   get id() {
     return this.#comment.id;
+  }
+
+  _restoreHandlers() {
+    this.element.querySelector('.film-details__comment-delete').addEventListener('click', this.#deleteClickHandler);
+
   }
 
   #deleteClickHandler = () => {
