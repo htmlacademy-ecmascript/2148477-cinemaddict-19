@@ -47,7 +47,7 @@ export default class PopupPresenter {
 
     this.#commentsModel.addObserver(this.#handleCommentsModelEvent);
     this.#commentsModel.addObserver(this.#filmsModel.handleCommentsModelChange);
-    this.#filmsModel.addObserver(this.#handleModelEvent);
+    this.#filmsModel.addObserver(this.#handleFilmsModelEvent);
   }
 
   init(filmCard) {
@@ -104,46 +104,37 @@ export default class PopupPresenter {
     render(this.#popupCommentLoadingComponent, this.#popupCommentContainerComponent.element.firstElementChild);
   }
 
+  setDisabled() {
+    this.#popupCommentNewComponent.updateElement({
+      isDisabled: true,
+    });
+  }
+
+  setDeleting(commentComponent) {
+    commentComponent.updateElement({
+      isDeleting: true,
+    });
+  }
+
   #handleFormSubmit = (comment) => {
-    // const newCommentId = Math.round( Math.random() * 1000 );
+    this.setDisabled();
 
     this.#handleViewAction(
       UserAction.ADD_COMMENT,
       UpdateType.PATCH,
       comment,
     );
-
-    // this.#handleViewAction(
-    //   UserAction.UPDATE_FILM_CARD,
-    //   UpdateType.PATCH,
-    //   {
-    //     ...this.#filmCard,
-    //     comments: [...this.#filmCard.comments, newCommentId],
-    //   }
-    // );
   };
 
-  #handleDeleteClick = (comment) => {
+  #handleDeleteClick = (comment, commentComponent) => {
+    this.setDeleting(commentComponent);
+
     this.#handleViewAction(
       UserAction.DELETE_COMMENT,
       UpdateType.PATCH,
       comment,
       this.#filmCard
     );
-
-    // const index = this.#comments.findIndex((comm) => comm.id === comment.id);
-
-    // this.#handleViewAction(
-    //   UserAction.UPDATE_FILM_CARD,
-    //   UpdateType.PATCH,
-    //   {
-    //     ...this.#filmCard,
-    //     comments: [
-    //       ...this.#filmCard.comments.slice(0, index),
-    //       ...this.#filmCard.comments.slice(index + 1),
-    //     ]
-    //   }
-    // );
   };
 
   #handleCommentsModelEvent = (updateType) => {
@@ -156,7 +147,7 @@ export default class PopupPresenter {
     this.init( this.#filmsModel.films.find( (element) => element.id === this.#filmCard.id ) );
   };
 
-  #handleModelEvent = () => {
+  #handleFilmsModelEvent = () => {
     if (this.#mode() === Mode.POPUP) {
       this.earsePopup();
       this.init( this.#filmsModel.films.find( (element) => element.id === this.#filmCard.id ) );
