@@ -277,7 +277,7 @@ export default class MainBoardPresenter {
   }
 
   #renderHeader() {
-    this.#headerPresenter.init({films: this.films});
+    this.#headerPresenter.init({filmsModel: this.#filmsModel});
   }
 
   #handleShowMoreButtonClick = () => {
