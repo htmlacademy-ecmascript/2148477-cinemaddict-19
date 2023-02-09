@@ -45,8 +45,6 @@ export default class PopupPresenter {
     this.#handlePopupRemoval = onPopupRemove;
     this.#getMode = getMode;
 
-    this.#popupCommentNewComponent = new PopupCommentNewView({onFormSubmit: this.#handleFormSubmit});
-
     this.#commentsModel.addObserver(this.#handleCommentsModelEvent);
     this.#commentsModel.addObserver(this.#filmsModel.handleCommentsModelChange);
     this.#filmsModel.addObserver(this.#handleFilmsModelEvent);
@@ -68,6 +66,10 @@ export default class PopupPresenter {
       onAlreadyWatchedClick: this.#alreadyWatchedClickHandler,
       onFavoriteClick: this.#favoriteClickHandler,
     });
+
+    if (!this.#popupCommentNewComponent) {
+      this.#popupCommentNewComponent = new PopupCommentNewView({onFormSubmit: this.#handleFormSubmit});
+    }
 
     this.#container.classList.add('hide-overflow');
     this.#container.addEventListener('keydown', this.#escKeyDownHandler);
@@ -152,7 +154,7 @@ export default class PopupPresenter {
     this.#commentViews.forEach((commentView) => remove(commentView));
 
     remove(this.#popupCommentNewComponent);
-    this.#popupCommentNewComponent.reset();
+    this.#popupCommentNewComponent?.reset();
 
     remove(this.#popupFilmDetailsComponent);
     remove(this.#popupFilmControlsComponent);

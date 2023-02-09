@@ -61,11 +61,11 @@ export default class PopupCommentNewView extends AbstractStatefulView {
     return createPopupCommentNewTemplate(this._state);
   }
 
-  reset() {
+  reset = () => {
     this.updateElement(
       PopupCommentNewView.parseCommentToState(NEW_COMMENT),
     );
-  }
+  };
 
   _restoreHandlers() {
     document.addEventListener('keydown', this.#formSubmitHandler);
