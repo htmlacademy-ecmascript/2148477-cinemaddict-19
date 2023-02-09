@@ -86,7 +86,13 @@ export default class PopupCommentNewView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     this.#keysPressed[evt.key] = true;
-    if (this.#keysPressed['Control'] && evt.key === 'Enter') {
+
+    function isApple() {
+      const expression = /(Mac|iPhone|iPod|iPad)/i;
+      return expression.test(navigator.platform);
+    }
+
+    if (isApple() && this.#keysPressed['Meta'] || this.#keysPressed['Control'] && evt.key === 'Enter') {
       if (this._state.comment !== '' && this._state.emotion !== '') {
         this.#handleFormSubmit(PopupCommentNewView.parseStateToComment(this._state));
         this.reset();
