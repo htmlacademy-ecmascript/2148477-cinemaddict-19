@@ -61,11 +61,11 @@ export default class PopupCommentNewView extends AbstractStatefulView {
     return createPopupCommentNewTemplate(this._state);
   }
 
-  reset() {
+  reset = () => {
     this.updateElement(
       PopupCommentNewView.parseCommentToState(NEW_COMMENT),
     );
-  }
+  };
 
   _restoreHandlers() {
     document.addEventListener('keydown', this.#formSubmitHandler);
@@ -86,7 +86,8 @@ export default class PopupCommentNewView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     this.#keysPressed[evt.key] = true;
-    if (this.#keysPressed['Control'] && evt.key === 'Enter') {
+
+    if (this.#keysPressed['Meta'] || this.#keysPressed['Control'] && evt.key === 'Enter') {
       if (this._state.comment !== '' && this._state.emotion !== '') {
         this.#handleFormSubmit(PopupCommentNewView.parseStateToComment(this._state));
         this.reset();

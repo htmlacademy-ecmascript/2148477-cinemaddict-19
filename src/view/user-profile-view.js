@@ -12,7 +12,7 @@ function createUserProfileTemplate(alreadyWatched) {
     profileRating = 'fan';
   }
   if (alreadyWatched >= WATCHED_FILMS_TO_BE_MOVIE_BUFF) {
-    profileRating = 'movie buff';
+    profileRating = 'Movie Buff';
   }
 
   return (
