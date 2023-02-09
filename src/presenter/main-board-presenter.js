@@ -24,7 +24,7 @@ import { Mode, SortType, UpdateType, UserAction, FILM_EXTRA_CARD_COUNT, FILM_EXT
 const FILM_CARDS_COUNT_PER_STEP = 5;
 const TimeLimit = {
   LOWER_LIMIT: 100,
-  UPPER_LIMIT: 700,
+  UPPER_LIMIT: 600,
 };
 
 export default class MainBoardPresenter {
