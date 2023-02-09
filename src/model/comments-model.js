@@ -51,7 +51,13 @@ export default class CommentsModel extends Observable {
         ...this.#comments.slice(0, index),
         ...this.#comments.slice(index + 1),
       ];
-      this._notify(updateType, filmCard);
+      this._notify(
+        updateType,
+        {
+          ...filmCard,
+          comments: filmCard.comments.filter((comment) => comment !== update.id),
+        }
+      );
     } catch(err) {
       throw new Error('Can\'t delete comment');
     }
