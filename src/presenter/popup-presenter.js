@@ -68,8 +68,9 @@ export default class PopupPresenter {
     });
 
     if (!this.#popupCommentNewComponent) {
-      this.#popupCommentNewComponent = new PopupCommentNewView({onFormSubmit: this.#handleFormSubmit});
+      this.#popupCommentNewComponent = new PopupCommentNewView({onFormSubmit: this.#handleFormSubmit, page: this.#container});
     }
+    this.#popupCommentNewComponent?.addGlobalHandlers();
 
     this.#container.classList.add('hide-overflow');
     this.#container.addEventListener('keydown', this.#escKeyDownHandler);
@@ -159,6 +160,7 @@ export default class PopupPresenter {
 
     remove(this.#popupCommentNewComponent);
     this.#popupCommentNewComponent?.reset();
+    this.#popupCommentNewComponent?.removeGlobalHandlers();
 
     remove(this.#popupFilmDetailsComponent);
     remove(this.#popupFilmControlsComponent);
