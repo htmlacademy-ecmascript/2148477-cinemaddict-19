@@ -6,13 +6,13 @@ function createUserProfileTemplate(alreadyWatched) {
 
   let profileRating = '';
   if (alreadyWatched < WATCHED_FILMS_TO_BE_FAN) {
-    profileRating = 'novice';
+    profileRating = 'Novice';
   }
   if (alreadyWatched >= WATCHED_FILMS_TO_BE_FAN) {
-    profileRating = 'fan';
+    profileRating = 'Fan';
   }
   if (alreadyWatched >= WATCHED_FILMS_TO_BE_MOVIE_BUFF) {
-    profileRating = 'movie buff';
+    profileRating = 'Movie Buff';
   }
 
   return (

@@ -48,11 +48,13 @@ function createPopupCommentNewTemplate(comment) {
 export default class PopupCommentNewView extends AbstractStatefulView {
   #handleFormSubmit = null;
   #keysPressed = {};
+  #page = null;
 
-  constructor({comment = NEW_COMMENT, onFormSubmit}) {
+  constructor({comment = NEW_COMMENT, onFormSubmit, page}) {
     super();
     this._setState({...comment});
     this.#handleFormSubmit = onFormSubmit;
+    this.#page = page;
 
     this._restoreHandlers();
   }
@@ -61,18 +63,23 @@ export default class PopupCommentNewView extends AbstractStatefulView {
     return createPopupCommentNewTemplate(this._state);
   }
 
-  reset() {
+  reset = () => {
     this.updateElement(
       PopupCommentNewView.parseCommentToState(NEW_COMMENT),
     );
-  }
+  };
+
+  addGlobalHandlers = () => {
+    this.#page.addEventListener('keydown', this.#formSubmitHandler);
+    this.#page.addEventListener('keyup', this.#keyupHandler);
+  };
+
+  removeGlobalHandlers = () => {
+    this.#page.removeEventListener('keydown', this.#formSubmitHandler);
+    this.#page.removeEventListener('keyup', this.#keyupHandler);
+  };
 
   _restoreHandlers() {
-    document.addEventListener('keydown', this.#formSubmitHandler);
-
-    document.addEventListener('keyup', (evt) => {
-      delete this.#keysPressed[evt.key];
-    });
     this.element.querySelector('.film-details__emoji-list').addEventListener('click', this.#chooseEmojiHandler);
     this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#commentInputHandler);
   }
@@ -84,12 +91,16 @@ export default class PopupCommentNewView extends AbstractStatefulView {
     });
   };
 
+  #keyupHandler = (evt) => {
+    delete this.#keysPressed[evt.key];
+  };
+
   #formSubmitHandler = (evt) => {
     this.#keysPressed[evt.key] = true;
-    if (this.#keysPressed['Control'] && evt.key === 'Enter') {
+
+    if (this.#keysPressed['Meta'] || this.#keysPressed['Control'] && evt.key === 'Enter') {
       if (this._state.comment !== '' && this._state.emotion !== '') {
         this.#handleFormSubmit(PopupCommentNewView.parseStateToComment(this._state));
-        this.reset();
       }
     }
   };

@@ -22,7 +22,7 @@ function createFilterItemTemplate(filter, currentFilterType) {
       class="main-navigation__item${type === currentFilterType ? ' main-navigation__item--active' : ''}"
       data-filter="${type}"
     >
-      ${type === FilterType.ALL ? name : `${name} <span class="main-navigation__item-count">${count}</span>`}
+      ${type === FilterType.ALL ? name : `${name} <span class="main-navigation__item-count" data-filter="${type}">${count}</span>`}
     </a>`
   );
 }

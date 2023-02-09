@@ -45,8 +45,6 @@ export default class PopupPresenter {
     this.#handlePopupRemoval = onPopupRemove;
     this.#getMode = getMode;
 
-    this.#popupCommentNewComponent = new PopupCommentNewView({onFormSubmit: this.#handleFormSubmit});
-
     this.#commentsModel.addObserver(this.#handleCommentsModelEvent);
     this.#commentsModel.addObserver(this.#filmsModel.handleCommentsModelChange);
     this.#filmsModel.addObserver(this.#handleFilmsModelEvent);
@@ -68,6 +66,11 @@ export default class PopupPresenter {
       onAlreadyWatchedClick: this.#alreadyWatchedClickHandler,
       onFavoriteClick: this.#favoriteClickHandler,
     });
+
+    if (!this.#popupCommentNewComponent) {
+      this.#popupCommentNewComponent = new PopupCommentNewView({onFormSubmit: this.#handleFormSubmit, page: this.#container});
+    }
+    this.#popupCommentNewComponent?.addGlobalHandlers();
 
     this.#container.classList.add('hide-overflow');
     this.#container.addEventListener('keydown', this.#escKeyDownHandler);
@@ -104,12 +107,12 @@ export default class PopupPresenter {
 
   setAborting(actionType, comment) {
     if (actionType === UserAction.ADD_COMMENT) {
-      this.#popupCommentNewComponent.shake(this.#popupCommentNewComponent.reset);
+      this.#popupCommentNewComponent.shake(this.#popupCommentNewComponent.updateElement({isDisabled: false}));
     } else if (actionType === UserAction.DELETE_COMMENT) {
       const shakingCommentView = this.#commentViews.find((commentView) => commentView.id === comment.id);
 
       const resetFormState = () => {
-        shakingCommentView.updateElement({isDeleting: false,});
+        shakingCommentView.updateElement({isDeleting: false});
       };
 
       shakingCommentView.shake(resetFormState);
@@ -129,6 +132,10 @@ export default class PopupPresenter {
       isDeleting: true,
     });
   }
+
+  resetForm = () => {
+    this.#popupCommentNewComponent.reset();
+  };
 
   earsePopup = () => {
     remove(this.#popupFilmDetailsComponent);
@@ -152,7 +159,8 @@ export default class PopupPresenter {
     this.#commentViews.forEach((commentView) => remove(commentView));
 
     remove(this.#popupCommentNewComponent);
-    this.#popupCommentNewComponent.reset();
+    this.#popupCommentNewComponent?.reset();
+    this.#popupCommentNewComponent?.removeGlobalHandlers();
 
     remove(this.#popupFilmDetailsComponent);
     remove(this.#popupFilmControlsComponent);

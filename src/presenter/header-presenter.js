@@ -13,8 +13,8 @@ export default class HeaderPresenter {
     this.#container = document.querySelector('.header');
   }
 
-  init({films}) {
-    this.#films = films;
+  init({filmsModel}) {
+    this.#films = filmsModel.films;
 
     if (this.#userProfileComponent !== null) {
       remove(this.#userProfileComponent);

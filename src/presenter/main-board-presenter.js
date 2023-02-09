@@ -24,7 +24,7 @@ import { Mode, SortType, UpdateType, UserAction, FILM_EXTRA_CARD_COUNT, FILM_EXT
 const FILM_CARDS_COUNT_PER_STEP = 5;
 const TimeLimit = {
   LOWER_LIMIT: 100,
-  UPPER_LIMIT: 700,
+  UPPER_LIMIT: 600,
 };
 
 export default class MainBoardPresenter {
@@ -277,7 +277,7 @@ export default class MainBoardPresenter {
   }
 
   #renderHeader() {
-    this.#headerPresenter.init({films: this.films});
+    this.#headerPresenter.init({filmsModel: this.#filmsModel});
   }
 
   #handleShowMoreButtonClick = () => {
@@ -318,6 +318,7 @@ export default class MainBoardPresenter {
       case UserAction.ADD_COMMENT:
         try {
           await this.#commentsModel.addComment(updateType, update);
+          this.#popupPresenter.resetForm();
         } catch(err) {
           this.#popupPresenter.setAborting(actionType);
         }
