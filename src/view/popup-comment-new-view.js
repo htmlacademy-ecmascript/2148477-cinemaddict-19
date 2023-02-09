@@ -90,7 +90,6 @@ export default class PopupCommentNewView extends AbstractStatefulView {
     if (this.#keysPressed['Meta'] || this.#keysPressed['Control'] && evt.key === 'Enter') {
       if (this._state.comment !== '' && this._state.emotion !== '') {
         this.#handleFormSubmit(PopupCommentNewView.parseStateToComment(this._state));
-        this.reset();
       }
     }
   };

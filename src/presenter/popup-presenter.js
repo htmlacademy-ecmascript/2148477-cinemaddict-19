@@ -106,12 +106,12 @@ export default class PopupPresenter {
 
   setAborting(actionType, comment) {
     if (actionType === UserAction.ADD_COMMENT) {
-      this.#popupCommentNewComponent.shake(this.#popupCommentNewComponent.reset);
+      this.#popupCommentNewComponent.shake(this.#popupCommentNewComponent.updateElement({isDisabled: false}));
     } else if (actionType === UserAction.DELETE_COMMENT) {
       const shakingCommentView = this.#commentViews.find((commentView) => commentView.id === comment.id);
 
       const resetFormState = () => {
-        shakingCommentView.updateElement({isDeleting: false,});
+        shakingCommentView.updateElement({isDeleting: false});
       };
 
       shakingCommentView.shake(resetFormState);
@@ -131,6 +131,10 @@ export default class PopupPresenter {
       isDeleting: true,
     });
   }
+
+  resetForm = () => {
+    this.#popupCommentNewComponent.reset();
+  };
 
   earsePopup = () => {
     remove(this.#popupFilmDetailsComponent);

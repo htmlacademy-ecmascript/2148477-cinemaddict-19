@@ -318,6 +318,7 @@ export default class MainBoardPresenter {
       case UserAction.ADD_COMMENT:
         try {
           await this.#commentsModel.addComment(updateType, update);
+          this.#popupPresenter.resetForm();
         } catch(err) {
           this.#popupPresenter.setAborting(actionType);
         }
